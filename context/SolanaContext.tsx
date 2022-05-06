@@ -107,10 +107,6 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
     return selectedCluster.label === cluster.label;
   };
 
-  useEffect(() => {
-    console.log(endpoint);
-  }, [endpoint]);
-
   return (
     <ConnectionProvider endpoint={endpoint}>
       <WalletProvider wallets={wallets} autoConnect>

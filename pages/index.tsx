@@ -3,29 +3,35 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import type { NextPage } from "next";
 import { FormEvent, ReactNode, useState } from "react";
+import { ProgramSelector } from "../components/common/ProgramSelector/ProgramSelector";
 import { getLayout } from "../components/layouts/SiteLayout";
-
-const SERUM_DEX_V3 = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
+import { useSerum } from "../context/SerumContext";
 
 const Home = () => {
   const { connection } = useConnection();
+  const { programID } = useSerum();
 
-  const [programID, setProgramID] = useState("");
   const [marketAddress, setMarketAddress] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    const serumMarket = await Market.load(
-      connection,
-      new PublicKey(marketAddress),
-      { commitment: "confirmed" },
-      new PublicKey(SERUM_DEX_V3)
-    );
-    console.log(serumMarket.decoded);
+    try {
+      const serumMarket = await Market.load(
+        connection,
+        new PublicKey(marketAddress),
+        { commitment: "confirmed" },
+        programID
+      );
+      console.log(serumMarket.decoded);
+    } catch (e) {
+      // TODO: snackbar
+      console.error(e);
+    }
   };
 
   return (
     <div className="flex flex-col space-y-4 items-stretch">
+      <ProgramSelector />
       <form className="flex flex-col space-y-2" onSubmit={handleSubmit}>
         <input
           type="text"

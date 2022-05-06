@@ -40,14 +40,7 @@ export const SettingsButton: FC<SettingButtonProps> = () => {
   return (
     <div className="relative flex justify-end" ref={dropdownRef}>
       <div
-        onClick={
-          wallet.connected
-            ? () => {
-                console.log("hello");
-                setShowDropdown(!showDropdown);
-              }
-            : () => setVisible(!visible)
-        }
+        onClick={() => setShowDropdown(!showDropdown)}
         className="cursor-pointer"
       >
         <CogIcon className="h-6 w-6 text-cyan-500" />

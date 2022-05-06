@@ -42,7 +42,6 @@ export const WalletButton: FC<WalletButtonProps> = () => {
         onClick={
           wallet.connected
             ? () => {
-                console.log("hello");
                 setShowDropdown(!showDropdown);
               }
             : () => setVisible(!visible)
