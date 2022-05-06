@@ -1,6 +1,7 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { FC, FormEvent, useEffect, useRef, useState } from "react";
+import { CogIcon } from "@heroicons/react/outline";
 import {
   CLUSTERS,
   CUSTOM_RPC_CLUSTER,
@@ -8,9 +9,9 @@ import {
 } from "../../../context/SolanaContext";
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 
-type WalletButtonProps = {};
+type SettingButtonProps = {};
 
-export const WalletButton: FC<WalletButtonProps> = () => {
+export const SettingsButton: FC<SettingButtonProps> = () => {
   const wallet = useWallet();
   const { connection } = useConnection();
   const { visible, setVisible } = useWalletModal();
@@ -38,7 +39,7 @@ export const WalletButton: FC<WalletButtonProps> = () => {
 
   return (
     <div className="relative flex justify-end" ref={dropdownRef}>
-      <button
+      <div
         onClick={
           wallet.connected
             ? () => {
@@ -47,23 +48,48 @@ export const WalletButton: FC<WalletButtonProps> = () => {
               }
             : () => setVisible(!visible)
         }
-        className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded"
+        className="cursor-pointer"
       >
-        {wallet.connected
-          ? `${wallet.publicKey!.toString().slice(0, 6)}...`
-          : "Connect"}
-      </button>
+        <CogIcon className="h-6 w-6 text-cyan-500" />
+      </div>
       <ul
         className={`${
           showDropdown ? "block" : "hidden"
-        } absolute top-full w-64 my-2 py-2 bg-cyan-900 rounded flex flex-col space-y-1`}
+        } absolute top-full w-64 my-4 py-2 bg-cyan-900 rounded flex flex-col space-y-1`}
       >
+        {CLUSTERS.map((cluster) => {
+          if (cluster.label !== "Custom RPC")
+            return (
+              <li
+                key={cluster.endpoint}
+                onClick={() => setCluster(cluster)}
+                className={`${
+                  isActiveCluster(cluster) ? "bg-cyan-800" : "bg-cyan-900"
+                } hover:bg-cyan-800 p-2 cursor-pointer`}
+              >
+                <div>
+                  <h2 className="font-bold">{cluster.label}</h2>
+                  <p className="text-xs">{cluster.endpoint}</p>
+                </div>
+              </li>
+            );
+        })}
         <li
-          className={`hover:bg-cyan-800 p-2 cursor-pointer`}
-          onClick={() => wallet.disconnect()}
+          className={`${
+            isActiveCluster(CUSTOM_RPC_CLUSTER) ? "bg-cyan-800" : "bg-cyan-900"
+          } hover:bg-cyan-800 p-2 cursor-pointer`}
+          onClick={() => setCluster(CUSTOM_RPC_CLUSTER)}
         >
           <div>
-            <h2 className="font-medium">Disconnect</h2>
+            <h2 className="font-bold">Custom RPC</h2>
+            {cluster.label === "Custom RPC" && (
+              <input
+                type="text"
+                value={endpoint}
+                onChange={(e) => setEndpoint(e.target.value)}
+                className="border border-cyan-600 p-2 rounded my-2 w-full bg-cyan-700 focus:outline-none"
+              />
+            )}
           </div>
         </li>
       </ul>
