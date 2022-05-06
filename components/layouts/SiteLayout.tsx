@@ -13,8 +13,11 @@ export const SiteLayout: FC<SiteLayoutProps> = ({title, children}: SiteLayoutPro
         <Head>
             <title>{title ? `${title} - Serum Explorer` : `Serum Explorer`}</title>
         </Head>
-        <div>
+        <div className="md:max-w-2xl mx-auto">
             <Header />
+            <div className="px-4">
+                {children}
+            </div>
         </div>
         </>
     )

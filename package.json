@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@project-serum/serum": "^0.13.65",
     "@solana/wallet-adapter-base": "^0.9.5",
     "@solana/wallet-adapter-react": "^0.15.4",
     "@solana/wallet-adapter-react-ui": "^0.9.6",
@@ -19,7 +20,7 @@
     "react-dom": "18.1.0"
   },
   "devDependencies": {
-    "@types/node": "17.0.31",
+    "@types/node": "^17.0.31",
     "@types/react": "18.0.8",
     "@types/react-dom": "18.0.3",
     "autoprefixer": "^10.4.7",

@@ -10,7 +10,7 @@ const Header: FC<HeaderProps> = () => {
     const {visible, setVisible} = useWalletModal();
     
     return (
-        <div className="w-full px-6 py-4 flex items-center justify-between">
+        <div className="w-full p-4 flex items-center justify-between">
             <h1 className="font-bold text-2xl text-white">Serum Explorer</h1>
             <WalletButton />
         </div>
