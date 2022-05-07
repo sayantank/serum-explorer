@@ -10,14 +10,14 @@ const Header: FC<HeaderProps> = () => {
   const { cluster } = useSolana();
 
   return (
-    <div className="w-full p-4 flex items-center justify-between">
+    <div className="w-full p-4 flex items-center justify-between border-b-2 border-b-cyan-900 mb-4">
       <Link href="/">
         <a className="font-bold text-2xl text-white no-underline">
           Serum Explorer
         </a>
       </Link>
       <div className="flex items-center space-x-4">
-        <p className="text-sm text-cyan-500">{cluster.label}</p>
+        <p className="text-sm text-cyan-500 text-right">{cluster.label}</p>
         <SettingsButton />
         <WalletButton />
       </div>
