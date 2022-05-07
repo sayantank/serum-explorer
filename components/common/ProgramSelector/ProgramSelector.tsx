@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useSerum } from "../../../context/SerumContext";
 
 export const ProgramSelector = () => {
@@ -18,6 +18,10 @@ export const ProgramSelector = () => {
       // TODO: snackbar
     }
   };
+
+  useEffect(() => {
+    setCustomProgramID(programID.toString());
+  }, [programID, setCustomProgramID]);
 
   return (
     <div className="w-full p-4 bg-cyan-700 rounded">

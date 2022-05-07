@@ -3,7 +3,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import type { NextPage } from "next";
 import { FormEvent, ReactNode, useState } from "react";
-import { ProgramSelector } from "../components/common/ProgramSelector/ProgramSelector";
+import { ProgramSelector } from "../components/common/ProgramSelector";
 import { getLayout } from "../components/layouts/SiteLayout";
 import { useSerum } from "../context/SerumContext";
 
