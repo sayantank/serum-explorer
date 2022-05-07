@@ -1,6 +1,7 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { FC, FormEvent, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
+import { KeyIcon } from "@heroicons/react/outline";
 import {
   CLUSTERS,
   CUSTOM_RPC_CLUSTER,
@@ -46,11 +47,16 @@ export const WalletButton: FC<WalletButtonProps> = () => {
               }
             : () => setVisible(!visible)
         }
-        className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded"
+        className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded"
       >
-        {wallet.connected
-          ? `${wallet.publicKey!.toString().slice(0, 6)}...`
-          : "Connect"}
+        <div className="md:block hidden py-2 px-4">
+          {wallet.connected
+            ? `${wallet.publicKey!.toString().slice(0, 6)}...`
+            : "Connect"}
+        </div>
+        <div className="md:hidden p-2">
+          <KeyIcon className="h-6 w-6" />
+        </div>
       </button>
       <ul
         className={`${

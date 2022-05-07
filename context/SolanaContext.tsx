@@ -31,7 +31,7 @@ type SolanaCluster = {
 
 type SolanaContextType = {
   cluster: SolanaCluster;
-  setCluster: Dispatch<SetStateAction<SolanaCluster>>;
+  setCluster: (cluster: SolanaCluster) => void;
   customEndpoint: string;
   setCustomEndpoint: Dispatch<SetStateAction<string>>;
   isActiveCluster: (selectedCluster: SolanaCluster) => boolean;
@@ -42,6 +42,8 @@ type SolanaProviderProps = {
 };
 
 const SolanaContext = createContext<SolanaContextType | null>(null);
+
+export const CLUSTER_LOCAL_STORAGE_KEY = "cluster-serum-explorer";
 
 export const LOCALNET_URL = "https://localhost:8899";
 
@@ -83,7 +85,7 @@ export const isActiveCluster = (
 };
 
 export const SolanaProvider = ({ children }: SolanaProviderProps) => {
-  const [cluster, setCluster] = useState(CLUSTERS[0]);
+  const [cluster, _setCluster] = useState(CLUSTERS[0]);
   const [customEndpoint, setCustomEndpoint] = useState(LOCALNET_URL);
 
   const endpoint = useMemo(() => {
@@ -106,6 +108,24 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const isActiveCluster = (selectedCluster: SolanaCluster): boolean => {
     return selectedCluster.label === cluster.label;
   };
+
+  const setCluster = (cluster: SolanaCluster) => {
+    window.localStorage.setItem(
+      CLUSTER_LOCAL_STORAGE_KEY,
+      JSON.stringify(cluster)
+    );
+    _setCluster(cluster);
+  };
+
+  useEffect(() => {
+    if (window.localStorage.getItem(CLUSTER_LOCAL_STORAGE_KEY)) {
+      _setCluster(
+        JSON.parse(
+          window.localStorage.getItem(CLUSTER_LOCAL_STORAGE_KEY) as string
+        )
+      );
+    } else setCluster(CLUSTERS[0]);
+  }, []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

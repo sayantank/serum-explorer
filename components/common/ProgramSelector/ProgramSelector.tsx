@@ -10,9 +10,8 @@ export const ProgramSelector = () => {
 
   const handleProgramChange = (e: FormEvent) => {
     e.preventDefault();
-    console.log(customProgramID);
     try {
-      setProgramID(new PublicKey(customProgramID));
+      setProgramID(customProgramID);
       setIsChanging(false);
     } catch (e) {
       console.error(e);
