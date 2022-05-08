@@ -48,8 +48,12 @@ const MarketPage = () => {
   const TableRow = ({ label, value }: { label: string; value: string }) => {
     return (
       <tr>
-        <td className="text-sm font-medium p-4 whitespace-nowrap">{label}</td>
-        <td className="text-sm font-light p-4 whitespace-nowrap">{value}</td>
+        <td className="text-sm font-medium p-4 md:px-8 whitespace-nowrap">
+          {label}
+        </td>
+        <td className="text-sm font-light p-4 md:px-8 whitespace-nowrap flex justify-end">
+          <p>{value}</p>
+        </td>
       </tr>
     );
   };
@@ -69,11 +73,11 @@ const MarketPage = () => {
           </div>
         </div>
         <div className="bg-cyan-800 rounded w-full">
-          <div className="w-full p-4 border-b-2 border-b-cyan-600">
+          <div className="w-full p-4 md:px-8 border-b-2 border-b-cyan-600">
             <h3 className="font-medium text-lg">Overview</h3>
           </div>
           <div className="w-full overflow-x-auto">
-            <table className="table-auto">
+            <table className="table-auto w-full">
               <tbody className="divide-y divide-cyan-600">
                 <TableRow
                   label="Market Address"
