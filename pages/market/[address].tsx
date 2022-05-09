@@ -8,6 +8,8 @@ import { useSerumMarket } from "../../hooks/useSerumMarket";
 import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
 import BN from "bn.js";
 import { Mint } from "@solana/spl-token-2";
+import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { EXPLORER_ADDRESS_BASE } from "../../utils/constants";
 
 const MarketPage = () => {
   const router = useRouter();
@@ -28,18 +30,27 @@ const MarketPage = () => {
   const { mint: baseMint } = useSPLToken(serumMarket?.baseMintAddress);
   const { mint: quoteMint } = useSPLToken(serumMarket?.quoteMintAddress);
 
-  useEffect(() => {
-    if (serumMarket) console.log(serumMarket.decoded);
-  }, [serumMarket]);
-
-  const TableRow = ({ label, value }: { label: string; value: string }) => {
+  const TableRow = ({
+    label,
+    value,
+    link,
+  }: {
+    label: string;
+    value: string;
+    link?: string;
+  }) => {
     return (
       <tr>
         <td className="text-sm font-medium p-4 md:px-8 whitespace-nowrap">
           {label}
         </td>
-        <td className="text-sm font-light p-4 md:px-8 whitespace-nowrap flex justify-end">
+        <td className="text-sm font-light p-4 md:px-8 whitespace-nowrap flex justify-end items-center space-x-2">
           <p>{value}</p>
+          {link ? (
+            <a href={link} target="_blank" rel="noopener noreferrer">
+              <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            </a>
+          ) : null}
         </td>
       </tr>
     );
@@ -76,7 +87,16 @@ const MarketPage = () => {
         <div className="flex flex-col">
           <h3 className="text-cyan-200 font-light text-sm">Address</h3>
           {/* TODO: Add copy to clipboard feature */}
-          <p>{vaultAddress.toString().slice(0, 24)}...</p>
+          <div className="flex items-center space-x-2">
+            <p>{vaultAddress.toString().slice(0, 24)}...</p>
+            <a
+              href={`${EXPLORER_ADDRESS_BASE}/${vaultAddress.toString()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            </a>
+          </div>
         </div>
       </div>
     );
@@ -106,14 +126,17 @@ const MarketPage = () => {
                 <TableRow
                   label="Market Address"
                   value={serumMarket.address.toString()}
+                  link={`${EXPLORER_ADDRESS_BASE}${serumMarket.address.toString()}`}
                 />
                 <TableRow
                   label="Base Mint"
                   value={serumMarket.baseMintAddress.toString()}
+                  link={`${EXPLORER_ADDRESS_BASE}${serumMarket.baseMintAddress.toString()}`}
                 />
                 <TableRow
                   label="Quote Mint"
                   value={serumMarket.quoteMintAddress.toString()}
+                  link={`${EXPLORER_ADDRESS_BASE}${serumMarket.quoteMintAddress.toString()}`}
                 />
                 <TableRow
                   label="Tick Size"
@@ -147,7 +170,9 @@ const MarketPage = () => {
         ) : null}
       </div>
     );
-  } else return <h1>hello</h1>;
+  }
+
+  return <p>loading</p>;
 };
 
 MarketPage.getLayout = (page: ReactNode) => getLayout(page, "Market");

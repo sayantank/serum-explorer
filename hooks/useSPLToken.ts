@@ -19,7 +19,9 @@ export const useSPLToken = (mintAddress: PublicKey | undefined) => {
     error,
     isValidating,
     mutate,
-  } = useSWR(() => mintAddress && [mintAddress, connection], fetcher);
+  } = useSWR(() => mintAddress && [mintAddress, connection], fetcher, {
+    revalidateOnFocus: false,
+  });
 
   const loading = !mint && !error;
 

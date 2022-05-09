@@ -30,7 +30,10 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
     mutate,
   } = useSWR(
     () => marketAddress && programID && [marketAddress, programID, connection],
-    fetcher
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   const loading = !serumMarket && !error;
