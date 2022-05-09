@@ -1,13 +1,11 @@
-import { Market } from "@project-serum/serum";
-import { useConnection } from "@solana/wallet-adapter-react";
 import { PublicKey } from "@solana/web3.js";
 import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { getLayout } from "../../components/layouts/SiteLayout";
-import { useSerum } from "../../context/SerumContext";
+import { programs } from "@metaplex/js";
 import { useMetaplexMetadata, useSPLToken } from "../../hooks";
 import { useSerumMarket } from "../../hooks/useSerumMarket";
-import { tokenAtomicsToDecimal } from "../../utils/numerical";
+import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
 import BN from "bn.js";
 import { Mint } from "@solana/spl-token-2";
 
@@ -52,11 +50,13 @@ const MarketPage = () => {
     mint,
     depositAtomics,
     vaultAddress,
+    metadata,
   }: {
     title: string;
     mint: Mint;
     depositAtomics: BN;
     vaultAddress: PublicKey;
+    metadata: programs.metadata.Metadata | null;
   }) => {
     return (
       <div className="bg-cyan-800 rounded p-4 flex flex-col space-y-4">
@@ -65,9 +65,12 @@ const MarketPage = () => {
           <h3 className="text-cyan-200 font-light text-sm">Balance</h3>
           <div className="flex space-x-2 items-end">
             <p className="text-4xl font-bold">
-              {tokenAtomicsToDecimal(depositAtomics, mint.decimals).toString()}{" "}
+              {tokenAtomicsToPrettyDecimal(
+                depositAtomics,
+                mint.decimals
+              ).toString()}{" "}
             </p>
-            <p>{baseMetadata ? baseMetadata.data.data.symbol : "tokens"}</p>
+            <p>{metadata ? metadata.data.data.symbol : "tokens"}</p>
           </div>
         </div>
         <div className="flex flex-col">
@@ -81,7 +84,7 @@ const MarketPage = () => {
 
   if (serumMarket) {
     return (
-      <div className="flex flex-col items-stretch space-y-4">
+      <div className="flex flex-col items-stretch space-y-4 my-8">
         {baseMetadata && quoteMetadata ? (
           <div>
             <h3 className="text-sm font-light text-cyan-500">Tokens</h3>
@@ -131,12 +134,14 @@ const MarketPage = () => {
               mint={baseMint}
               depositAtomics={serumMarket.decoded.baseDepositsTotal}
               vaultAddress={serumMarket.decoded.baseVault}
+              metadata={baseMetadata}
             />
             <VaultCard
               title="Quote Vault"
               mint={quoteMint}
               depositAtomics={serumMarket.decoded.quoteDepositsTotal}
               vaultAddress={serumMarket.decoded.quoteVault}
+              metadata={quoteMetadata}
             />
           </div>
         ) : null}
