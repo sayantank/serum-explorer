@@ -1,6 +1,7 @@
 import { PublicKey } from "@solana/web3.js";
 import { FormEvent, useEffect, useState } from "react";
 import { useSerum } from "../../../context/SerumContext";
+import { DEX_PROGRAMS } from "../../../utils/constants";
 
 export const ProgramSelector = () => {
   const { programID, setProgramID } = useSerum();
@@ -28,7 +29,11 @@ export const ProgramSelector = () => {
       <h2 className="text-md font-bold">Program Address</h2>
       {!isChanging ? (
         <div className="flex items-center space-x-4">
-          <p className="text-sm">{programID.toString().slice(0, 25)}...</p>
+          <p className="text-sm">
+            {DEX_PROGRAMS[programID.toString()]
+              ? DEX_PROGRAMS[programID.toString()]
+              : `${programID.toString()}...`}
+          </p>
           <button
             className="text-sm underline"
             onClick={() => setIsChanging(true)}

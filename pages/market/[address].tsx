@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { getLayout } from "../../components/layouts/SiteLayout";
 import { programs } from "@metaplex/js";
 import { useMetaplexMetadata, useSPLToken } from "../../hooks";
