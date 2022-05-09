@@ -8,13 +8,12 @@ import { useSerum } from "../../context/SerumContext";
 import { useMetaplexMetadata, useSPLToken } from "../../hooks";
 import { useSerumMarket } from "../../hooks/useSerumMarket";
 import { tokenAtomicsToDecimal } from "../../utils/numerical";
+import BN from "bn.js";
+import { Mint } from "@solana/spl-token-2";
 
 const MarketPage = () => {
   const router = useRouter();
   const { address } = router.query;
-
-  const { connection } = useConnection();
-  const { programID } = useSerum();
 
   // TODO: handle loading
   const [pageLoading, setPageLoading] = useState(true);
@@ -45,6 +44,38 @@ const MarketPage = () => {
           <p>{value}</p>
         </td>
       </tr>
+    );
+  };
+
+  const VaultCard = ({
+    title,
+    mint,
+    depositAtomics,
+    vaultAddress,
+  }: {
+    title: string;
+    mint: Mint;
+    depositAtomics: BN;
+    vaultAddress: PublicKey;
+  }) => {
+    return (
+      <div className="bg-cyan-800 rounded p-4 flex flex-col space-y-4">
+        <h2 className="text-xl font-bold w-full">{title}</h2>
+        <div className="flex flex-col">
+          <h3 className="text-cyan-200 font-light text-sm">Balance</h3>
+          <div className="flex space-x-2 items-end">
+            <p className="text-4xl font-bold">
+              {tokenAtomicsToDecimal(depositAtomics, mint.decimals).toString()}{" "}
+            </p>
+            <p>{baseMetadata ? baseMetadata.data.data.symbol : "tokens"}</p>
+          </div>
+        </div>
+        <div className="flex flex-col">
+          <h3 className="text-cyan-200 font-light text-sm">Address</h3>
+          {/* TODO: Add copy to clipboard feature */}
+          <p>{vaultAddress.toString().slice(0, 24)}...</p>
+        </div>
+      </div>
     );
   };
 
@@ -89,29 +120,26 @@ const MarketPage = () => {
                   label="Min. Order Size"
                   value={serumMarket.minOrderSize.toString()}
                 />
-                {/* TODO: Refactor into separate UI */}
-                {baseMint && quoteMint ? (
-                  <>
-                    <TableRow
-                      label="Base Deposits"
-                      value={tokenAtomicsToDecimal(
-                        serumMarket.decoded.baseDepositsTotal,
-                        baseMint.decimals
-                      ).toString()}
-                    />
-                    <TableRow
-                      label="Quote Deposits"
-                      value={tokenAtomicsToDecimal(
-                        serumMarket.decoded.quoteDepositsTotal,
-                        quoteMint.decimals
-                      ).toString()}
-                    />
-                  </>
-                ) : null}
               </tbody>
             </table>
           </div>
         </div>
+        {baseMint && quoteMint ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <VaultCard
+              title="Base Vault"
+              mint={baseMint}
+              depositAtomics={serumMarket.decoded.baseDepositsTotal}
+              vaultAddress={serumMarket.decoded.baseVault}
+            />
+            <VaultCard
+              title="Quote Vault"
+              mint={quoteMint}
+              depositAtomics={serumMarket.decoded.quoteDepositsTotal}
+              vaultAddress={serumMarket.decoded.quoteVault}
+            />
+          </div>
+        ) : null}
       </div>
     );
   } else return <h1>hello</h1>;
