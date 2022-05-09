@@ -5,7 +5,9 @@ import { useRouter } from "next/router";
 import { ReactNode, useEffect, useState } from "react";
 import { getLayout } from "../../components/layouts/SiteLayout";
 import { useSerum } from "../../context/SerumContext";
-import { useMetaplexMetadata } from "../../hooks";
+import { useMetaplexMetadata, useSPLToken } from "../../hooks";
+import { useSerumMarket } from "../../hooks/useSerumMarket";
+import { tokenAtomicsToDecimal } from "../../utils/numerical";
 
 const MarketPage = () => {
   const router = useRouter();
@@ -16,7 +18,8 @@ const MarketPage = () => {
 
   // TODO: handle loading
   const [pageLoading, setPageLoading] = useState(true);
-  const [serumMarket, setSerumMarket] = useState<Market | null>(null);
+
+  const { serumMarket } = useSerumMarket(address as string);
 
   const baseMetadata = useMetaplexMetadata(
     serumMarket?.baseMintAddress.toString()
@@ -25,25 +28,12 @@ const MarketPage = () => {
     serumMarket?.quoteMintAddress.toString()
   );
 
+  const { mint: baseMint } = useSPLToken(serumMarket?.baseMintAddress);
+  const { mint: quoteMint } = useSPLToken(serumMarket?.quoteMintAddress);
+
   useEffect(() => {
-    const loadPage = async () => {
-      try {
-        const _serumMarket = await Market.load(
-          connection,
-          new PublicKey(address as string),
-          { commitment: "confirmed" },
-          programID
-        );
-        setSerumMarket(_serumMarket);
-      } catch (e) {
-        console.error(e);
-        setSerumMarket(null);
-      } finally {
-        setPageLoading(false);
-      }
-    };
-    loadPage();
-  }, [address, connection, programID]);
+    if (serumMarket) console.log(serumMarket.decoded);
+  }, [serumMarket]);
 
   const TableRow = ({ label, value }: { label: string; value: string }) => {
     return (
@@ -61,17 +51,17 @@ const MarketPage = () => {
   if (serumMarket) {
     return (
       <div className="flex flex-col items-stretch space-y-4">
-        <div>
-          <h3 className="text-sm font-light text-cyan-500">Tokens</h3>
-          <div className="text-2xl font-bold">
-            {baseMetadata && quoteMetadata ? (
+        {baseMetadata && quoteMetadata ? (
+          <div>
+            <h3 className="text-sm font-light text-cyan-500">Tokens</h3>
+            <div className="text-2xl font-bold">
               <p>
                 {baseMetadata.data.data.symbol} /{" "}
                 {quoteMetadata.data.data.symbol}
               </p>
-            ) : null}
+            </div>
           </div>
-        </div>
+        ) : null}
         <div className="bg-cyan-800 rounded w-full">
           <div className="w-full p-4 md:px-8 border-b-2 border-b-cyan-600">
             <h3 className="font-medium text-lg">Overview</h3>
@@ -99,6 +89,25 @@ const MarketPage = () => {
                   label="Min. Order Size"
                   value={serumMarket.minOrderSize.toString()}
                 />
+                {/* TODO: Refactor into separate UI */}
+                {baseMint && quoteMint ? (
+                  <>
+                    <TableRow
+                      label="Base Deposits"
+                      value={tokenAtomicsToDecimal(
+                        serumMarket.decoded.baseDepositsTotal,
+                        baseMint.decimals
+                      ).toString()}
+                    />
+                    <TableRow
+                      label="Quote Deposits"
+                      value={tokenAtomicsToDecimal(
+                        serumMarket.decoded.quoteDepositsTotal,
+                        quoteMint.decimals
+                      ).toString()}
+                    />
+                  </>
+                ) : null}
               </tbody>
             </table>
           </div>

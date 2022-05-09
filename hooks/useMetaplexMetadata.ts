@@ -14,10 +14,6 @@ export const useMetaplexMetadata = (mint?: string) => {
   );
 
   useEffect(() => {
-    console.log(mint);
-  }, [mint]);
-
-  useEffect(() => {
     const loadMetadata = async () => {
       try {
         const ownedMetadata = await Metadata.load(
