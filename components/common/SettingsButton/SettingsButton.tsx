@@ -1,5 +1,3 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { FC, FormEvent, useEffect, useRef, useState } from "react";
 import { CogIcon } from "@heroicons/react/outline";
 import {
@@ -12,9 +10,6 @@ import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 type SettingButtonProps = {};
 
 export const SettingsButton: FC<SettingButtonProps> = () => {
-  const wallet = useWallet();
-  const { connection } = useConnection();
-  const { visible, setVisible } = useWalletModal();
   const { setCustomEndpoint, cluster, setCluster, isActiveCluster } =
     useSolana();
 
@@ -30,12 +25,16 @@ export const SettingsButton: FC<SettingButtonProps> = () => {
         const endpointURL = new URL(endpoint);
         setCustomEndpoint(endpointURL.toString());
       } catch (e) {
+        // TODO: handle error, this timeout was being called multiple times
+        console.log("invalid url");
         setCustomEndpoint(CUSTOM_RPC_CLUSTER.endpoint);
       }
     }, 1500);
 
     return () => clearTimeout(debounceTimer);
-  }, [endpoint, setCustomEndpoint]);
+    // TODO: setCustomEndpoint is changing, and hence the useEffect keeps running, need to solve?
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [endpoint]);
 
   return (
     <div className="relative flex justify-end" ref={dropdownRef}>

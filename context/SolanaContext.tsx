@@ -34,7 +34,7 @@ type SolanaContextType = {
   cluster: SolanaCluster;
   setCluster: (cluster: SolanaCluster) => void;
   customEndpoint: string;
-  setCustomEndpoint: Dispatch<SetStateAction<string>>;
+  setCustomEndpoint: (endpoint: string) => void;
   isActiveCluster: (selectedCluster: SolanaCluster) => boolean;
 };
 
@@ -87,7 +87,7 @@ export const isActiveCluster = (
 
 export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const [cluster, _setCluster] = useState(CLUSTERS[0]);
-  const [customEndpoint, setCustomEndpoint] = useState(LOCALNET_URL);
+  const [customEndpoint, _setCustomEndpoint] = useState(LOCALNET_URL);
 
   const router = useRouter();
 
@@ -115,6 +115,7 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const setCluster = (cluster: SolanaCluster) => {
     const newQuery: {
       network?: string;
+      customRPC?: string;
     } = {
       ...router.query,
       network: cluster.network,
@@ -122,6 +123,22 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
 
     if (cluster.network === "mainnet-beta") delete newQuery.network;
 
+    if (cluster.network === "custom") newQuery.customRPC = LOCALNET_URL;
+    else delete newQuery.customRPC;
+
+    router.replace({
+      query: newQuery,
+    });
+  };
+
+  const setCustomEndpoint = (endpoint: string) => {
+    if (cluster.network !== "custom") return;
+    const newQuery: {
+      customRPC?: string;
+    } = {
+      ...router.query,
+      customRPC: endpoint,
+    };
     router.replace({
       query: newQuery,
     });
@@ -134,6 +151,12 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
       );
     } else _setCluster(CLUSTERS[0]);
   }, [router.query.network]);
+
+  useEffect(() => {
+    if (router.query.customRPC) {
+      _setCustomEndpoint(router.query.customRPC as string);
+    }
+  }, [router.query.customRPC]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
