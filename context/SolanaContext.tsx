@@ -10,6 +10,7 @@ import {
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
+import { useRouter } from "next/router";
 import {
   createContext,
   Dispatch,
@@ -21,7 +22,7 @@ import {
   useState,
 } from "react";
 
-type ClusterType = "mainnet-beta" | "testnet" | "devnet" | "localnet";
+type ClusterType = "mainnet-beta" | "testnet" | "devnet" | "custom";
 
 type SolanaCluster = {
   label: string;
@@ -53,11 +54,11 @@ export const CLUSTERS: SolanaCluster[] = [
     network: "mainnet-beta",
     endpoint: clusterApiUrl("mainnet-beta"),
   },
-  {
-    label: "Mainnet (Serum)",
-    network: "mainnet-beta",
-    endpoint: "https://solana-api.projectserum.com",
-  },
+  // {
+  //   label: "Mainnet (Serum)",
+  //   network: "mainnet-beta",
+  //   endpoint: "https://solana-api.projectserum.com",
+  // },
   {
     label: "Testnet",
     network: "testnet",
@@ -70,7 +71,7 @@ export const CLUSTERS: SolanaCluster[] = [
   },
   {
     label: "Custom RPC",
-    network: "mainnet-beta", // Not relevant rn
+    network: "custom", // Not relevant rn
     endpoint: LOCALNET_URL,
   },
 ];
@@ -87,6 +88,8 @@ export const isActiveCluster = (
 export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const [cluster, _setCluster] = useState(CLUSTERS[0]);
   const [customEndpoint, setCustomEndpoint] = useState(LOCALNET_URL);
+
+  const router = useRouter();
 
   const endpoint = useMemo(() => {
     if (cluster.label === "Custom RPC") {
@@ -110,22 +113,27 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   };
 
   const setCluster = (cluster: SolanaCluster) => {
-    window.localStorage.setItem(
-      CLUSTER_LOCAL_STORAGE_KEY,
-      JSON.stringify(cluster)
-    );
-    _setCluster(cluster);
+    const newQuery: {
+      network?: string;
+    } = {
+      ...router.query,
+      network: cluster.network,
+    };
+
+    if (cluster.network === "mainnet-beta") delete newQuery.network;
+
+    router.replace({
+      query: newQuery,
+    });
   };
 
   useEffect(() => {
-    if (window.localStorage.getItem(CLUSTER_LOCAL_STORAGE_KEY)) {
+    if (router.query.network) {
       _setCluster(
-        JSON.parse(
-          window.localStorage.getItem(CLUSTER_LOCAL_STORAGE_KEY) as string
-        )
+        CLUSTERS.filter((c) => c.network === router.query.network)[0]
       );
-    } else setCluster(CLUSTERS[0]);
-  }, []);
+    } else _setCluster(CLUSTERS[0]);
+  }, [router.query.network]);
 
   return (
     <ConnectionProvider endpoint={endpoint}>
