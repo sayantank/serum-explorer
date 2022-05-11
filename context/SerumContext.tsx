@@ -1,4 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
+import { useRouter } from "next/router";
 import {
   createContext,
   Dispatch,
@@ -25,22 +26,34 @@ type SerumProviderProps = {
 const SerumContext = createContext<SerumContextType | null>(null);
 
 export const SerumProvider = ({ children }: SerumProviderProps) => {
+  const router = useRouter();
+
   const [programID, _setProgramID] = useState(new PublicKey(SERUM_DEX_V3));
 
   const setProgramID = (programID: string) => {
-    window.localStorage.setItem(PROGRAM_LOCAL_STORAGE_KEY, programID);
-    _setProgramID(new PublicKey(programID));
+    const newQuery: {
+      programID?: string;
+    } = {
+      ...router.query,
+      programID,
+    };
+
+    if (programID === SERUM_DEX_V3) delete newQuery.programID;
+
+    router.replace({
+      query: newQuery,
+    });
   };
 
   useEffect(() => {
-    if (window.localStorage.getItem(PROGRAM_LOCAL_STORAGE_KEY)) {
-      _setProgramID(
-        new PublicKey(
-          window.localStorage.getItem(PROGRAM_LOCAL_STORAGE_KEY) as string
-        )
-      );
-    } else setProgramID(SERUM_DEX_V3);
-  }, []);
+    if (router.query.programID) {
+      _setProgramID(new PublicKey(router.query.programID));
+    } else _setProgramID(new PublicKey(SERUM_DEX_V3));
+  }, [router.query.programID]);
+
+  useEffect(() => {
+    console.log(programID.toString());
+  }, [programID]);
 
   return (
     <SerumContext.Provider value={{ programID, setProgramID }}>
