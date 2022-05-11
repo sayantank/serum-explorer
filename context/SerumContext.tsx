@@ -9,6 +9,7 @@ import {
   useEffect,
   useState,
 } from "react";
+import { toast } from "react-toastify";
 
 const PROGRAM_LOCAL_STORAGE_KEY = "program-serum-explorer";
 
@@ -39,6 +40,14 @@ export const SerumProvider = ({ children }: SerumProviderProps) => {
     };
 
     if (programID === SERUM_DEX_V3) delete newQuery.programID;
+
+    try {
+      new PublicKey(programID);
+    } catch (e) {
+      console.error(e);
+      toast.error("Invalid program ID");
+      return;
+    }
 
     router.replace({
       query: newQuery,
