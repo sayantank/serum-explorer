@@ -11,13 +11,8 @@ export const ProgramSelector = () => {
 
   const handleProgramChange = (e: FormEvent) => {
     e.preventDefault();
-    try {
-      setProgramID(customProgramID);
-      setIsChanging(false);
-    } catch (e) {
-      console.error(e);
-      // TODO: snackbar
-    }
+    setProgramID(customProgramID);
+    setIsChanging(false);
   };
 
   useEffect(() => {

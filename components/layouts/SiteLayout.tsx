@@ -20,6 +20,10 @@ export const SiteLayout: FC<SiteLayoutProps> = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    // NOTE: If not deleted, extra ?address=xyz is added
+    delete router.query.address;
+
     router.push({ pathname: `/market/${marketAddress}`, query: router.query });
   };
   return (

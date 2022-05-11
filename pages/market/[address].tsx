@@ -1,6 +1,6 @@
 import { PublicKey } from "@solana/web3.js";
 import { useRouter } from "next/router";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { getLayout } from "../../components/layouts/SiteLayout";
 import { programs } from "@metaplex/js";
 import { useMetaplexMetadata, useSPLToken } from "../../hooks";
@@ -20,10 +20,10 @@ const MarketPage = () => {
 
   const { serumMarket } = useSerumMarket(address as string);
 
-  const baseMetadata = useMetaplexMetadata(
+  const { metadata: baseMetadata } = useMetaplexMetadata(
     serumMarket?.baseMintAddress.toString()
   );
-  const quoteMetadata = useMetaplexMetadata(
+  const { metadata: quoteMetadata } = useMetaplexMetadata(
     serumMarket?.quoteMintAddress.toString()
   );
 
@@ -67,7 +67,7 @@ const MarketPage = () => {
     mint: Mint;
     depositAtomics: BN;
     vaultAddress: PublicKey;
-    metadata: programs.metadata.Metadata | null;
+    metadata: programs.metadata.Metadata | undefined;
   }) => {
     return (
       <div className="bg-cyan-800 rounded p-4 flex flex-col space-y-4">

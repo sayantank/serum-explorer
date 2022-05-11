@@ -1,4 +1,4 @@
-import { FC, FormEvent, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import { CogIcon } from "@heroicons/react/outline";
 import {
   CLUSTERS,
@@ -6,6 +6,7 @@ import {
   useSolana,
 } from "../../../context/SolanaContext";
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
+import { toast } from "react-toastify";
 
 type SettingButtonProps = {};
 
@@ -20,16 +21,21 @@ export const SettingsButton: FC<SettingButtonProps> = () => {
   useOutsideAlerter(dropdownRef, showDropdown, () => setShowDropdown(false));
 
   useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      try {
-        const endpointURL = new URL(endpoint);
-        setCustomEndpoint(endpointURL.toString());
-      } catch (e) {
-        // TODO: handle error, this timeout was being called multiple times
-        console.log("invalid url");
-        setCustomEndpoint(CUSTOM_RPC_CLUSTER.endpoint);
-      }
-    }, 1500);
+    let debounceTimer: NodeJS.Timeout;
+
+    if (cluster.network === "custom") {
+      debounceTimer = setTimeout(() => {
+        try {
+          const endpointURL = new URL(endpoint);
+          setCustomEndpoint(endpointURL.toString());
+          toast.success("RPC endpoint updated!");
+        } catch (e) {
+          console.error(e);
+          toast.error("Invalid RPC endpoint");
+          setCustomEndpoint(CUSTOM_RPC_CLUSTER.endpoint);
+        }
+      }, 1500);
+    }
 
     return () => clearTimeout(debounceTimer);
     // TODO: setCustomEndpoint is changing, and hence the useEffect keeps running, need to solve?

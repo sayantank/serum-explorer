@@ -71,7 +71,7 @@ export const CLUSTERS: SolanaCluster[] = [
   },
   {
     label: "Custom RPC",
-    network: "custom", // Not relevant rn
+    network: "custom",
     endpoint: LOCALNET_URL,
   },
 ];
