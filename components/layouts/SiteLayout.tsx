@@ -20,7 +20,7 @@ export const SiteLayout: FC<SiteLayoutProps> = ({
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    router.push(`/market/${marketAddress}`);
+    router.push({ pathname: `/market/${marketAddress}`, query: router.query });
   };
   return (
     <>
