@@ -20,10 +20,10 @@ const MarketPage = () => {
 
   const { serumMarket } = useSerumMarket(address as string);
 
-  const baseMetadata = useMetaplexMetadata(
+  const { metadata: baseMetadata } = useMetaplexMetadata(
     serumMarket?.baseMintAddress.toString()
   );
-  const quoteMetadata = useMetaplexMetadata(
+  const { metadata: quoteMetadata } = useMetaplexMetadata(
     serumMarket?.quoteMintAddress.toString()
   );
 
@@ -67,7 +67,7 @@ const MarketPage = () => {
     mint: Mint;
     depositAtomics: BN;
     vaultAddress: PublicKey;
-    metadata: programs.metadata.Metadata | null;
+    metadata: programs.metadata.Metadata | undefined;
   }) => {
     return (
       <div className="bg-cyan-800 rounded p-4 flex flex-col space-y-4">

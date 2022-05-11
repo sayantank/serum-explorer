@@ -4,30 +4,46 @@ const {
 } = programs;
 
 import { useConnection } from "@solana/wallet-adapter-react";
-import { useEffect, useState } from "react";
+import { Connection } from "@solana/web3.js";
+import { toast } from "react-toastify";
+import useSWR from "swr";
+
+const fetcher = async (
+  mint: string,
+  connection: Connection
+): Promise<programs.metadata.Metadata> => {
+  const metadata = await Metadata.load(
+    connection,
+    await Metadata.getPDA(mint ? mint : "")
+  );
+  return metadata;
+};
 
 export const useMetaplexMetadata = (mint?: string) => {
   const { connection } = useConnection();
 
-  const [metadata, setMetadata] = useState<programs.metadata.Metadata | null>(
-    null
-  );
+  const {
+    data: metadata,
+    error,
+    isValidating,
+    mutate,
+  } = useSWR(() => mint && connection && [mint, connection], fetcher, {
+    revalidateOnFocus: false,
+    revalidateOnMount: false,
+    shouldRetryOnError: false,
+    onError: (err) => {
+      console.error(err);
+      toast.error("Failed to load market.");
+    },
+  });
 
-  useEffect(() => {
-    const loadMetadata = async () => {
-      try {
-        const ownedMetadata = await Metadata.load(
-          connection,
-          await Metadata.getPDA(mint ? mint : "")
-        );
-        setMetadata(ownedMetadata);
-      } catch (e) {
-        // NOTE: Decided to not put snackbar for metadata not found.
-        setMetadata(null);
-      }
-    };
-    loadMetadata();
-  }, [connection, mint]);
+  const loading = !metadata && !error;
 
-  return metadata;
+  return {
+    metadata,
+    loading,
+    error,
+    isValidating,
+    mutate,
+  };
 };
