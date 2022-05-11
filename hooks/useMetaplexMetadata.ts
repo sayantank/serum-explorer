@@ -34,7 +34,8 @@ export const useMetaplexMetadata = (mint?: string) => {
     errorRetryCount: 1,
     onError: (err) => {
       console.error(err);
-      toast.error("Failed to load market.");
+      // NOTE: Decided not to show snackbar for unavailable metadata.
+      // toast.error("Failed to load Token Metadata.");
     },
   });
 
