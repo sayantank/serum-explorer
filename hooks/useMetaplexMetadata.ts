@@ -22,7 +22,7 @@ export const useMetaplexMetadata = (mint?: string) => {
         );
         setMetadata(ownedMetadata);
       } catch (e) {
-        // TODO: snackbar
+        // NOTE: Decided to not put snackbar for metadata not found.
         setMetadata(null);
       }
     };

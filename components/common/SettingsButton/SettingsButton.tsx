@@ -6,6 +6,7 @@ import {
   useSolana,
 } from "../../../context/SolanaContext";
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
+import { toast } from "react-toastify";
 
 type SettingButtonProps = {};
 
@@ -24,9 +25,10 @@ export const SettingsButton: FC<SettingButtonProps> = () => {
       try {
         const endpointURL = new URL(endpoint);
         setCustomEndpoint(endpointURL.toString());
+        toast.success("RPC endpoint updated!");
       } catch (e) {
-        // TODO: handle error, this timeout was being called multiple times
-        console.log("invalid url");
+        console.error(e);
+        toast.error("Invalid RPC endpoint");
         setCustomEndpoint(CUSTOM_RPC_CLUSTER.endpoint);
       }
     }, 1500);

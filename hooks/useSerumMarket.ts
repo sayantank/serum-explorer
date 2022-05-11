@@ -2,6 +2,7 @@ import { Market } from "@project-serum/serum";
 import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import useSWR from "swr";
 import { useSerum } from "../context/SerumContext";
 
@@ -33,6 +34,12 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnMount: false,
+      shouldRetryOnError: false,
+      onError: (err) => {
+        console.error(err);
+        toast.error("Failed to load market.");
+      },
     }
   );
 
