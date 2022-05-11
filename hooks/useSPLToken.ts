@@ -22,8 +22,9 @@ export const useSPLToken = (mintAddress: PublicKey | undefined) => {
     mutate,
   } = useSWR(() => mintAddress && [mintAddress, connection], fetcher, {
     revalidateOnFocus: false,
-    revalidateOnMount: false,
-    shouldRetryOnError: false,
+    // revalidateOnMount: false,
+    // shouldRetryOnError: false,
+    errorRetryCount: 1,
     onError: (err) => {
       console.error(err);
       toast.error("Failed to SPL Token data.");

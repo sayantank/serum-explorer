@@ -34,8 +34,9 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
     fetcher,
     {
       revalidateOnFocus: false,
-      revalidateOnMount: false,
-      shouldRetryOnError: false,
+      // revalidateOnMount: false,
+      // shouldRetryOnError: false,
+      errorRetryCount: 1,
       onError: (err) => {
         console.error(err);
         toast.error("Failed to load market.");
