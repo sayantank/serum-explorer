@@ -10,7 +10,6 @@ const fetcher = async (
   programID: PublicKey,
   connection: Connection
 ): Promise<Market> => {
-  // console.log("fetching market", marketAddress);
   const market = await Market.load(
     connection,
     new PublicKey(marketAddress),
@@ -23,10 +22,6 @@ const fetcher = async (
 export const useSerumMarket = (marketAddress: string | undefined) => {
   const { connection } = useConnection();
   const { programID } = useSerum();
-
-  // useEffect(() => {
-  //   console.log(connection.rpcEndpoint);
-  // }, [connection]);
 
   const {
     data: serumMarket,
