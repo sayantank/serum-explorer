@@ -24,11 +24,8 @@ const fetcher = async (
   programID: PublicKey,
   connection: Connection
 ): Promise<Market[]> => {
-  console.log(connection.rpcEndpoint);
   const accounts = await connection.getParsedProgramAccounts(programID);
   const markets = accounts.filter(marketFilter);
-
-  console.log(markets);
 
   const fetchPromises = markets.map((m) =>
     Market.load(connection, m.pubkey, { commitment: "confirmed" }, programID)

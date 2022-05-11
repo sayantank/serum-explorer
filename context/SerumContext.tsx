@@ -51,10 +51,6 @@ export const SerumProvider = ({ children }: SerumProviderProps) => {
     } else _setProgramID(new PublicKey(SERUM_DEX_V3));
   }, [router.query.programID]);
 
-  useEffect(() => {
-    console.log(programID.toString());
-  }, [programID]);
-
   return (
     <SerumContext.Provider value={{ programID, setProgramID }}>
       {children}
