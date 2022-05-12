@@ -27,7 +27,7 @@ export const ProgramSelector = () => {
           <p className="text-sm">
             {DEX_PROGRAMS[programID.toString()]
               ? DEX_PROGRAMS[programID.toString()]
-              : `${programID.toString()}...`}
+              : `${programID.toString().slice(0, 18)}...`}
           </p>
           <button
             className="text-sm underline"

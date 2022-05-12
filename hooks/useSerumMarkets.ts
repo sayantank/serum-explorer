@@ -10,6 +10,11 @@ import {
 import { useState } from "react";
 import useSWR from "swr";
 import { useSerum } from "../context/SerumContext";
+import { useSolana } from "../context/SolanaContext";
+
+const isLocalhost = (url: string) => {
+  return url.includes("localhost") || url.includes("127.0.0.1");
+};
 
 const marketFilter = (acc: {
   pubkey: PublicKey;
@@ -36,6 +41,7 @@ const fetcher = async (
 };
 
 export const useSerumMarkets = () => {
+  const { cluster } = useSolana();
   const { connection } = useConnection();
   const { programID } = useSerum();
 
@@ -44,7 +50,15 @@ export const useSerumMarkets = () => {
     isValidating,
     error,
     mutate,
-  } = useSWR(programID && connection && [programID, connection], fetcher);
+  } = useSWR(
+    (cluster.network === "devnet" || isLocalhost(connection.rpcEndpoint)) &&
+      programID &&
+      connection && [programID, connection],
+    fetcher,
+    {
+      errorRetryCount: 1,
+    }
+  );
 
   const loading = !serumMarkets && !error;
 
