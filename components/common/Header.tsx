@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { FC } from "react";
 import { useSolana } from "../../context/SolanaContext";
 import { SettingsButton } from "./SettingsButton";
@@ -7,11 +8,17 @@ import { WalletButton } from "./WalletButton";
 type HeaderProps = {};
 
 const Header: FC<HeaderProps> = () => {
+  const router = useRouter();
   const { cluster } = useSolana();
 
   return (
     <div className="w-full p-4 flex items-center justify-between border-b-2 border-b-cyan-900 mb-4">
-      <Link href="/">
+      <Link
+        href={{
+          pathname: "/",
+          query: router.query,
+        }}
+      >
         <a className="font-bold text-2xl text-white no-underline">
           Serum Explorer
         </a>
