@@ -43,7 +43,7 @@ const fetcher = async (
     );
     serumMarkets = await Promise.all(fetchPromises);
   } else {
-    const data = await axios.get("http://serum-volume-tracker.vercel.app/");
+    const data = await axios.get("https://serum-volume-tracker.vercel.app/");
     console.log(data.data);
     throw new Error("hello");
   }
