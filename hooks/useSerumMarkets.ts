@@ -1,19 +1,17 @@
-import bs58 from "bs58";
-import { Market } from "@project-serum/serum";
-import { accountFlagsLayout } from "@project-serum/serum/lib/layout";
 import { useConnection } from "@solana/wallet-adapter-react";
-import {
-  AccountInfo,
-  Connection,
-  ParsedAccountData,
-  PublicKey,
-} from "@solana/web3.js";
+import { Connection, PublicKey } from "@solana/web3.js";
 import { useState } from "react";
 import useSWR from "swr";
 import { useSerum } from "../context/SerumContext";
 import { useSolana } from "../context/SolanaContext";
 import { MARKET_ACCOUNT_FLAGS_B58_ENCODED } from "../utils/constants";
 import axios from "axios";
+
+export type SerumMarketInfo = {
+  address: PublicKey;
+  baseSymbol?: string;
+  quoteSymbol?: string;
+};
 
 const isLocalhost = (url: string) => {
   return url.includes("localhost") || url.includes("127.0.0.1");
@@ -23,8 +21,8 @@ const fetcher = async (
   programID: PublicKey,
   connection: Connection,
   isLocalhost: boolean
-): Promise<Market[]> => {
-  let serumMarkets: Market[];
+): Promise<SerumMarketInfo[]> => {
+  let serumMarkets: SerumMarketInfo[];
 
   if (isLocalhost) {
     const markets = await connection.getParsedProgramAccounts(programID, {
@@ -37,15 +35,22 @@ const fetcher = async (
         },
       ],
     });
-
-    const fetchPromises = markets.map((m) =>
-      Market.load(connection, m.pubkey, { commitment: "confirmed" }, programID)
-    );
-    serumMarkets = await Promise.all(fetchPromises);
+    serumMarkets = markets.map((m) => ({ address: m.pubkey }));
   } else {
-    const data = await axios.get("https://serum-volume-tracker.vercel.app/");
-    console.log(data.data);
-    throw new Error("hello");
+    const { data } = await axios.get<{
+      tvl: number;
+      total_vol_1d: number;
+      markets: {
+        market_address: string;
+        base_symbol: string;
+        quote_symbol: string;
+      }[];
+    }>("https://serum-volume-tracker.vercel.app/api");
+    serumMarkets = data.markets.map((m) => ({
+      address: new PublicKey(m.market_address),
+      baseSymbol: m.base_symbol,
+      quoteSymbol: m.quote_symbol,
+    }));
   }
 
   return serumMarkets;
@@ -73,6 +78,8 @@ export const useSerumMarkets = () => {
     fetcher,
     {
       errorRetryCount: 1,
+      // revalidateOnMount: false,
+      revalidateOnFocus: false,
     }
   );
 
