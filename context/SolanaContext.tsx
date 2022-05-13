@@ -67,7 +67,7 @@ export const CLUSTERS: SolanaCluster[] = [
   {
     label: "Devnet",
     network: "devnet",
-    endpoint: "http://devnet-solana-api.projectserum.com",
+    endpoint: clusterApiUrl("devnet"),
   },
   {
     label: "Custom RPC",

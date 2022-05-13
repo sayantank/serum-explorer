@@ -1,13 +1,17 @@
 import { Market } from "@project-serum/serum";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { getLayout } from "../components/layouts/SiteLayout";
 import { useSerumMarkets } from "../hooks/useSerumMarkets";
 
 const Home = () => {
   const router = useRouter();
   const { serumMarkets } = useSerumMarkets();
+
+  useEffect(() => {
+    console.log(serumMarkets);
+  }, [serumMarkets]);
 
   const MarketListItem = ({ market }: { market: Market }) => {
     return (
