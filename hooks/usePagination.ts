@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 
+//crayz hook
 export const usePagination = <T>(
   data: Array<T> | undefined,
   pageSize: number
