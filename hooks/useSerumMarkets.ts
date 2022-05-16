@@ -1,10 +1,13 @@
 import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useSerum } from "../context/SerumContext";
 import { useSolana } from "../context/SolanaContext";
-import { MARKET_ACCOUNT_FLAGS_B58_ENCODED } from "../utils/constants";
+import {
+  MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+  SERUM_DEX_V3,
+} from "../utils/constants";
 import axios from "axios";
 
 export type SerumMarketInfo = {
@@ -56,10 +59,25 @@ const fetcher = async (
   return serumMarkets;
 };
 
+/**
+ * Returns the list of Markets for a given Program ID.
+ *
+ * Currently, this only returns markets for localnet or Serum Dex V3 on mainnet-beta.
+ */
 export const useSerumMarkets = () => {
   const { cluster } = useSolana();
   const { connection } = useConnection();
   const { programID } = useSerum();
+
+  const [doesFetch, setDoesFetch] = useState(false);
+
+  useEffect(() => {
+    setDoesFetch(
+      (cluster.network === "mainnet-beta" &&
+        programID.toString() === SERUM_DEX_V3) ||
+        isLocalhost(connection.rpcEndpoint)
+    );
+  }, [cluster.network, programID, connection.rpcEndpoint]);
 
   const {
     data: serumMarkets,
@@ -67,8 +85,7 @@ export const useSerumMarkets = () => {
     error,
     mutate,
   } = useSWR(
-    (cluster.network === "mainnet-beta" ||
-      isLocalhost(connection.rpcEndpoint)) &&
+    doesFetch &&
       programID &&
       connection && [
         programID,
@@ -83,7 +100,7 @@ export const useSerumMarkets = () => {
     }
   );
 
-  const loading = !serumMarkets && !error;
+  const loading = doesFetch && !serumMarkets && !error;
 
   return {
     serumMarkets,

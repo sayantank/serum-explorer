@@ -10,10 +10,7 @@ import {
   useState,
 } from "react";
 import { toast } from "react-toastify";
-
-const PROGRAM_LOCAL_STORAGE_KEY = "program-serum-explorer";
-
-const SERUM_DEX_V3 = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
+import { SERUM_DEX_V3 } from "../utils/constants";
 
 type SerumContextType = {
   programID: PublicKey;
