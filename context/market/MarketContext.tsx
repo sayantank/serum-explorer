@@ -1,5 +1,5 @@
 import { Market } from "@project-serum/serum";
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import { useEventQueue, useMetaplexMetadata, useSPLToken } from "../../hooks";
 import { programs } from "@metaplex/js";
 import { Mint } from "@solana/spl-token-2";

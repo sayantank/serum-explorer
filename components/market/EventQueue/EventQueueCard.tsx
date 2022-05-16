@@ -6,10 +6,6 @@ import { useEventQueue } from "../../../hooks/useEventQueue";
 import { EventData } from "./EventData";
 import { EventList } from "./EventList";
 
-type EventQueueCardProps = {
-  serumMarket: Market | undefined;
-};
-
 export const EventQueueCard = () => {
   const { serumMarket } = useMarket();
 
@@ -22,7 +18,6 @@ export const EventQueueCard = () => {
 
   useEffect(() => {
     if (eventQueue) {
-      console.log(eventQueue.length);
       setDisplayEvents(eventQueue.slice(0, 10));
     }
   }, [eventQueue]);
@@ -32,17 +27,23 @@ export const EventQueueCard = () => {
     else setSelectedIndex(undefined);
   }, [displayEvents]);
 
-  if (selectedIndex === undefined) return null;
-
   return (
     <div className="bg-cyan-800 flex flex-col space-y-4 rounded">
       <h3 className="card-header px-4 pt-4">Event Queue</h3>
-      <EventList
-        displayEvents={displayEvents}
-        onSelect={setSelectedIndex}
-        selectedIndex={selectedIndex}
-      />
-      <EventData event={displayEvents[selectedIndex]} />
+      {selectedIndex !== undefined ? (
+        <>
+          <EventList
+            displayEvents={displayEvents}
+            onSelect={setSelectedIndex}
+            selectedIndex={selectedIndex}
+          />
+          <EventData event={displayEvents[selectedIndex]} />
+        </>
+      ) : (
+        <div className="px-4 pb-4">
+          <p className="text-sm font-light">No events to show</p>
+        </div>
+      )}
     </div>
   );
 };

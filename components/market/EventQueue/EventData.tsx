@@ -8,8 +8,29 @@ type EventDataProps = {
   event: Event | undefined;
 };
 
+export type EventFlags = {
+  fill: boolean;
+  out: boolean;
+  bid: boolean;
+  maker: boolean;
+};
+
 export const EventData = ({ event }: EventDataProps) => {
   const { baseMint, quoteMint, baseMetadata, quoteMetadata } = useMarket();
+
+  const getType = (eventFlags: EventFlags) => {
+    if (eventFlags.fill) {
+      return "Fill";
+    } else if (eventFlags.out) {
+      return "Out";
+    } else if (eventFlags.bid) {
+      return "Bid";
+    } else if (eventFlags.maker) {
+      return "Maker";
+    } else {
+      return "Unknown";
+    }
+  };
 
   // TODO: Loading indicator
   if (!event || !baseMint || !quoteMint) {
@@ -19,6 +40,7 @@ export const EventData = ({ event }: EventDataProps) => {
   return (
     <div>
       <DataTable>
+        <DataTableRow label="Type" value={getType(event.eventFlags)} />
         <DataTableRow label="Order ID" value={event.orderId.toString()} />
         <DataTableRow label={`Fee Tier`} value={event.feeTier.toString()} />
         <DataTableRow

@@ -4,10 +4,6 @@ import { useMarket } from "../../../context/market";
 export const TokenDisplay = () => {
   const { serumMarket, baseMetadata, quoteMetadata } = useMarket();
 
-  useEffect(() => {
-    console.log(serumMarket);
-  }, [serumMarket]);
-
   if (!baseMetadata || !quoteMetadata) {
     return null;
   }
