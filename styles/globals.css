@@ -5,3 +5,7 @@
 body {
     @apply bg-slate-900 text-white;
 }
+
+.card-header {
+    @apply text-xl font-bold w-full;
+}
