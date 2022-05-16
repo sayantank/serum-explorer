@@ -1,52 +1,106 @@
-import { Market } from "@project-serum/serum";
-import { accountFlagsLayout } from "@project-serum/serum/lib/layout";
 import { useConnection } from "@solana/wallet-adapter-react";
-import {
-  AccountInfo,
-  Connection,
-  ParsedAccountData,
-  PublicKey,
-} from "@solana/web3.js";
-import { useState } from "react";
+import { Connection, PublicKey } from "@solana/web3.js";
+import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useSerum } from "../context/SerumContext";
+import { useSolana } from "../context/SolanaContext";
+import {
+  MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+  SERUM_DEX_V3,
+} from "../utils/constants";
+import axios from "axios";
 
-const marketFilter = (acc: {
-  pubkey: PublicKey;
-  account: AccountInfo<Buffer | ParsedAccountData>;
-}) => {
-  const bufferData = (acc.account.data as Buffer).slice(5, 70);
-  const decoded = accountFlagsLayout().decode(bufferData);
-  return decoded.initialized && decoded.market;
+export type SerumMarketInfo = {
+  address: PublicKey;
+  baseSymbol?: string;
+  quoteSymbol?: string;
+};
+
+const isLocalhost = (url: string) => {
+  return url.includes("localhost") || url.includes("127.0.0.1");
 };
 
 const fetcher = async (
   programID: PublicKey,
-  connection: Connection
-): Promise<Market[]> => {
-  const accounts = await connection.getParsedProgramAccounts(programID);
-  const markets = accounts.filter(marketFilter);
+  connection: Connection,
+  isLocalhost: boolean
+): Promise<SerumMarketInfo[]> => {
+  let serumMarkets: SerumMarketInfo[];
 
-  const fetchPromises = markets.map((m) =>
-    Market.load(connection, m.pubkey, { commitment: "confirmed" }, programID)
-  );
-  const serumMarkets = await Promise.all(fetchPromises);
+  if (isLocalhost) {
+    const markets = await connection.getParsedProgramAccounts(programID, {
+      filters: [
+        {
+          memcmp: {
+            offset: 5,
+            bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+          },
+        },
+      ],
+    });
+    serumMarkets = markets.map((m) => ({ address: m.pubkey }));
+  } else {
+    const { data } = await axios.get<{
+      tvl: number;
+      total_vol_1d: number;
+      markets: {
+        market_address: string;
+        base_symbol: string;
+        quote_symbol: string;
+      }[];
+    }>("https://serum-volume-tracker.vercel.app/api");
+    serumMarkets = data.markets.map((m) => ({
+      address: new PublicKey(m.market_address),
+      baseSymbol: m.base_symbol,
+      quoteSymbol: m.quote_symbol,
+    }));
+  }
 
   return serumMarkets;
 };
 
+/**
+ * Returns the list of Markets for a given Program ID.
+ *
+ * Currently, this only returns markets for localnet or Serum Dex V3 on mainnet-beta.
+ */
 export const useSerumMarkets = () => {
+  const { cluster } = useSolana();
   const { connection } = useConnection();
   const { programID } = useSerum();
+
+  const [doesFetch, setDoesFetch] = useState(false);
+
+  useEffect(() => {
+    setDoesFetch(
+      (cluster.network === "mainnet-beta" &&
+        programID.toString() === SERUM_DEX_V3) ||
+        isLocalhost(connection.rpcEndpoint)
+    );
+  }, [cluster.network, programID, connection.rpcEndpoint]);
 
   const {
     data: serumMarkets,
     isValidating,
     error,
     mutate,
-  } = useSWR(programID && connection && [programID, connection], fetcher);
+  } = useSWR(
+    doesFetch &&
+      programID &&
+      connection && [
+        programID,
+        connection,
+        isLocalhost(connection.rpcEndpoint),
+      ],
+    fetcher,
+    {
+      errorRetryCount: 1,
+      // revalidateOnMount: false,
+      revalidateOnFocus: false,
+    }
+  );
 
-  const loading = !serumMarkets && !error;
+  const loading = doesFetch && !serumMarkets && !error;
 
   return {
     serumMarkets,
