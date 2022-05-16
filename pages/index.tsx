@@ -98,7 +98,7 @@ const Home = () => {
             <div className="text-sm font-light text-center">
               Currently, Markets are only displayed for{" "}
               <span className="font-medium">localnet</span> and{" "}
-              <span className="font-medium">Serum Dex V3 on mainnet-beta.</span>
+              <span className="font-medium">Serum Dex V3</span>
             </div>
           )}
         </div>
