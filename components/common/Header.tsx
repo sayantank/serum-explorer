@@ -32,7 +32,7 @@ const Header: FC<HeaderProps> = () => {
       <div className="flex items-center space-x-4">
         <p className="text-sm text-cyan-500 text-right">{cluster.label}</p>
         <SettingsButton />
-        <WalletButton />
+        {/* <WalletButton /> */}
       </div>
     </div>
   );
