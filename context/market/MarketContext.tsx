@@ -12,6 +12,7 @@ export type MarketContextType = {
   baseMint?: Mint;
   quoteMint?: Mint;
   eventQueue?: Event[];
+  loading: boolean;
 };
 
 export type MarketProviderProps = {
@@ -25,7 +26,7 @@ export const MarketProvider = ({
   children,
   serumMarket,
 }: MarketProviderProps) => {
-  const { eventQueue } = useEventQueue(serumMarket);
+  const { eventQueue, loading: eventQueueLoading } = useEventQueue(serumMarket);
 
   const { metadata: baseMetadata } = useMetaplexMetadata(
     serumMarket?.baseMintAddress.toString()
@@ -34,8 +35,12 @@ export const MarketProvider = ({
     serumMarket?.quoteMintAddress.toString()
   );
 
-  const { mint: baseMint } = useSPLToken(serumMarket?.baseMintAddress);
-  const { mint: quoteMint } = useSPLToken(serumMarket?.quoteMintAddress);
+  const { mint: baseMint, loading: baseMintLoading } = useSPLToken(
+    serumMarket?.baseMintAddress
+  );
+  const { mint: quoteMint, loading: quoteMintLoading } = useSPLToken(
+    serumMarket?.quoteMintAddress
+  );
 
   return (
     <MarketContext.Provider
@@ -46,6 +51,7 @@ export const MarketProvider = ({
         baseMint,
         quoteMint,
         eventQueue,
+        loading: eventQueueLoading || baseMintLoading || quoteMintLoading,
       }}
     >
       {children}

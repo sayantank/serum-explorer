@@ -1,4 +1,4 @@
-import { Market } from "@project-serum/serum";
+import { RefreshIcon } from "@heroicons/react/outline";
 import { Event } from "@project-serum/serum/lib/queue";
 import { useEffect, useState } from "react";
 import { useMarket } from "../../../context/market";
@@ -9,7 +9,7 @@ import { EventList } from "./EventList";
 export const EventQueueCard = () => {
   const { serumMarket } = useMarket();
 
-  const { eventQueue } = useEventQueue(serumMarket);
+  const { eventQueue, mutate, isValidating } = useEventQueue(serumMarket);
 
   const [displayEvents, setDisplayEvents] = useState<Event[]>([]);
   const [selectedIndex, setSelectedIndex] = useState<number | undefined>(
@@ -29,7 +29,15 @@ export const EventQueueCard = () => {
 
   return (
     <div className="bg-cyan-800 flex flex-col space-y-4 rounded">
-      <h3 className="card-header px-4 pt-4">Event Queue</h3>
+      <div className="flex items-center justify-between px-4 pt-4">
+        <h3 className="card-header ">Event Queue</h3>
+        <RefreshIcon
+          className={`h-5 w-5 cursor-pointer ${
+            isValidating ? "animate-spin" : null
+          }`}
+          onClick={() => mutate()}
+        />
+      </div>
       {selectedIndex !== undefined ? (
         <>
           <EventList

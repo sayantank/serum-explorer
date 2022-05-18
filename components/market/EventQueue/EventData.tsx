@@ -16,49 +16,77 @@ export type EventFlags = {
 };
 
 export const EventData = ({ event }: EventDataProps) => {
-  const { baseMint, quoteMint, baseMetadata, quoteMetadata } = useMarket();
+  const { baseMint, quoteMint, baseMetadata, quoteMetadata, loading } =
+    useMarket();
 
   const getType = (eventFlags: EventFlags) => {
     if (eventFlags.fill) {
       return "Fill";
     } else if (eventFlags.out) {
       return "Out";
-    } else if (eventFlags.bid) {
-      return "Bid";
-    } else if (eventFlags.maker) {
-      return "Maker";
     } else {
       return "Unknown";
     }
   };
 
+  const getSide = (eventFlags: EventFlags) => {
+    if (eventFlags.bid) {
+      return "Bid";
+    } else return "Ask";
+  };
+
   // TODO: Loading indicator
-  if (!event || !baseMint || !quoteMint) {
+  if (loading) {
     return <p>Loading...</p>;
+  }
+
+  if (!event || !baseMint || !quoteMint) {
+    return (
+      <div>
+        <p>Oops! Something went wrong :(</p>
+      </div>
+    );
   }
 
   return (
     <div>
       <DataTable>
         <DataTableRow label="Type" value={getType(event.eventFlags)} />
+        <DataTableRow label="Side" value={getSide(event.eventFlags)} />
         <DataTableRow label="Order ID" value={event.orderId.toString()} />
+        <DataTableRow
+          label={`Open Orders`}
+          value={event.openOrders.toString()}
+        />
         <DataTableRow label={`Fee Tier`} value={event.feeTier.toString()} />
         <DataTableRow
           label={`${
-            quoteMetadata ? quoteMetadata.data.data.symbol : "Quote Tokens"
+            event.eventFlags.bid
+              ? quoteMetadata
+                ? quoteMetadata.data.data.symbol
+                : "Quote Tokens"
+              : baseMetadata
+              ? baseMetadata.data.data.symbol
+              : "Base Tokens"
           } Paid`}
           value={tokenAtomicsToPrettyDecimal(
             event.nativeQuantityPaid,
-            quoteMint.decimals
+            event.eventFlags.bid ? quoteMint.decimals : baseMint.decimals
           )}
         />
         <DataTableRow
           label={`${
-            baseMetadata ? baseMetadata.data.data.symbol : "Base Tokens"
-          } Received`}
+            event.eventFlags.bid
+              ? baseMetadata
+                ? baseMetadata.data.data.symbol
+                : "Quote Tokens"
+              : quoteMetadata
+              ? quoteMetadata.data.data.symbol
+              : "Base Tokens"
+          }  Received`}
           value={tokenAtomicsToPrettyDecimal(
             event.nativeQuantityReleased,
-            baseMint.decimals
+            event.eventFlags.bid ? baseMint.decimals : quoteMint.decimals
           )}
         />
       </DataTable>

@@ -1,4 +1,3 @@
-import { PublicKey } from "@solana/web3.js";
 import { FormEvent, useEffect, useState } from "react";
 import { useSerum } from "../../../context/SerumContext";
 import { DEX_PROGRAMS } from "../../../utils/constants";
@@ -45,6 +44,16 @@ export const ProgramSelector = () => {
             placeholder="Market Address"
             className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-500 focus:outline-none"
           />
+          {Object.entries(DEX_PROGRAMS).map(([programID, programLabel]) => (
+            <div
+              key={programID}
+              className="bg-cyan-800 hover:bg-cyan-900 transition-colors py-2 px-4 rounded flex items-center justify-between cursor-pointer"
+              onClick={() => setCustomProgramID(programID)}
+            >
+              <p className="text-sm font-medium">{programLabel}</p>
+              <p className="text-sm font-light">{programID.slice(0, 16)}...</p>
+            </div>
+          ))}
           <button
             type="submit"
             className="px-4 py-2 w-full rounded bg-cyan-500 hover:bg-cyan-600 text-white"
