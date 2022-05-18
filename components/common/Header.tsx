@@ -22,7 +22,7 @@ const Header: FC<HeaderProps> = () => {
   return (
     <div className="w-full py-4 px-4 md:px-0 flex items-center justify-between border-b-2 border-b-cyan-900 mb-4">
       <button
-        className="font-bold text-2xl text-white no-underline"
+        className="font-bold text-2xl text-white no-underline text-left"
         onClick={() =>
           router.push({ pathname: "/", query: sanitizeQuery(router.query) })
         }
@@ -32,7 +32,7 @@ const Header: FC<HeaderProps> = () => {
       <div className="flex items-center space-x-4">
         <p className="text-sm text-cyan-500 text-right">{cluster.label}</p>
         <SettingsButton />
-        <WalletButton />
+        {/* <WalletButton /> */}
       </div>
     </div>
   );
