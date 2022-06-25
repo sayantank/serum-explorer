@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 import { PaginationButton } from "../components/common/Pagination/PaginationButton";
 import { SkeletonBox } from "../components/common/Skeleton";
 import { getLayout } from "../components/layouts/SiteLayout";

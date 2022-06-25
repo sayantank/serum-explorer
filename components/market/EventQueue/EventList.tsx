@@ -28,7 +28,7 @@ export const EventList = ({
   }
 
   return (
-    <div className="w-full px-4 flex space-between space-x-2">
+    <div className="w-full flex space-between items-center space-x-2">
       {displayEvents.map((event, i) => (
         <div
           key={`${event.orderId.toString()} - ${i}`}

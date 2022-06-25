@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@headlessui/react": "^1.6.5",
     "@heroicons/react": "^1.0.6",
     "@metaplex/js": "^4.12.0",
     "@project-serum/serum": "^0.13.65",
