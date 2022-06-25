@@ -6,6 +6,7 @@ import { useMarket } from "../../../context/market";
 import { EventData } from "./EventData";
 import { EventList } from "./EventList";
 import { classNames } from "../../../utils/general";
+import { Cranker } from "./Cranker";
 
 export const EventQueueCard = () => {
   const { eventQueue } = useMarket();
@@ -68,16 +69,6 @@ export const EventQueueCard = () => {
                 onClick={() => eventQueue.mutate()}
               />
             </div>
-            <Tab.Panels>
-              <Tab.Panel>
-                <EventData event={displayEvents[selectedIndex]} />
-              </Tab.Panel>
-              <Tab.Panel>
-                <div className="px-4 pb-4 flex justify-between items-center w-full ">
-                  cranker
-                </div>
-              </Tab.Panel>
-            </Tab.Panels>
           </>
         ) : (
           <div className="px-4 pb-4 flex justify-between items-center w-full ">
@@ -90,6 +81,16 @@ export const EventQueueCard = () => {
             />
           </div>
         )}
+        <Tab.Panels>
+          <Tab.Panel>
+            {selectedIndex !== undefined ? (
+              <EventData event={displayEvents[selectedIndex]} />
+            ) : null}
+          </Tab.Panel>
+          <Tab.Panel>
+            <Cranker />
+          </Tab.Panel>
+        </Tab.Panels>
       </Tab.Group>
     </div>
   );
