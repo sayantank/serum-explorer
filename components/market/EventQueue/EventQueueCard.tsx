@@ -50,47 +50,52 @@ export const EventQueueCard = () => {
   return (
     <div className="bg-cyan-800 flex flex-col space-y-4 rounded">
       <Tab.Group>
-        <Tab.List className="flex items-center justify-between space-x-4 px-4 pt-4">
-          <EventQueueCardTab title="Event Queue" />
-          <EventQueueCardTab title="Cranker" />
-        </Tab.List>
-        {selectedIndex !== undefined ? (
+        {({ selectedIndex: tabIndex }) => (
           <>
-            <div className="flex space-x-4 items-center px-4">
-              <EventList
-                displayEvents={displayEvents}
-                onSelect={setSelectedIndex}
-                selectedIndex={selectedIndex}
-              />
-              <RefreshIcon
-                className={`h-5 w-5 cursor-pointer ${
-                  eventQueue.isValidating ? "animate-spin" : null
-                }`}
-                onClick={() => eventQueue.mutate()}
-              />
-            </div>
-          </>
-        ) : (
-          <div className="px-4 pb-4 flex justify-between items-center w-full ">
-            <p className="text-sm font-light">No events to show.</p>
-            <RefreshIcon
-              className={`h-5 w-5 cursor-pointer ${
-                eventQueue.isValidating ? "animate-spin" : null
-              }`}
-              onClick={() => eventQueue.mutate()}
-            />
-          </div>
-        )}
-        <Tab.Panels>
-          <Tab.Panel>
+            <Tab.List className="flex items-center justify-between space-x-4 px-4 pt-4">
+              <EventQueueCardTab title="Event Queue" />
+              <EventQueueCardTab title="Cranker" />
+            </Tab.List>
             {selectedIndex !== undefined ? (
-              <EventData event={displayEvents[selectedIndex]} />
-            ) : null}
-          </Tab.Panel>
-          <Tab.Panel>
-            <Cranker />
-          </Tab.Panel>
-        </Tab.Panels>
+              <>
+                <div className="flex space-x-4 items-center px-4">
+                  <EventList
+                    displayEvents={displayEvents}
+                    onSelect={setSelectedIndex}
+                    selectedIndex={selectedIndex}
+                    tabIndex={tabIndex}
+                  />
+                  <RefreshIcon
+                    className={`h-5 w-5 cursor-pointer ${
+                      eventQueue.isValidating ? "animate-spin" : null
+                    }`}
+                    onClick={() => eventQueue.mutate()}
+                  />
+                </div>
+              </>
+            ) : (
+              <div className="px-4 flex justify-between items-center w-full ">
+                <p className="text-sm font-light">No events to show.</p>
+                <RefreshIcon
+                  className={`h-5 w-5 cursor-pointer ${
+                    eventQueue.isValidating ? "animate-spin" : null
+                  }`}
+                  onClick={() => eventQueue.mutate()}
+                />
+              </div>
+            )}
+            <Tab.Panels>
+              <Tab.Panel>
+                {selectedIndex !== undefined ? (
+                  <EventData event={displayEvents[selectedIndex]} />
+                ) : null}
+              </Tab.Panel>
+              <Tab.Panel>
+                <Cranker />
+              </Tab.Panel>
+            </Tab.Panels>
+          </>
+        )}
       </Tab.Group>
     </div>
   );
