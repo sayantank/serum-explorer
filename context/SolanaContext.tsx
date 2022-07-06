@@ -22,7 +22,7 @@ import {
   useState,
 } from "react";
 
-type ClusterType = "mainnet-beta" | "testnet" | "devnet" | "custom";
+export type ClusterType = "mainnet-beta" | "testnet" | "devnet" | "custom";
 
 type SolanaCluster = {
   label: string;

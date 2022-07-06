@@ -1,17 +1,20 @@
 import { Event } from "@project-serum/serum/lib/queue";
 import { Dispatch, SetStateAction } from "react";
+import { classNames } from "../../../utils/general";
 import { EventFlags } from "./EventData";
 
 type EventListProps = {
   displayEvents: Event[];
   selectedIndex: number | undefined;
   onSelect: Dispatch<SetStateAction<number | undefined>>;
+  tabIndex: number;
 };
 
 export const EventList = ({
   displayEvents,
   onSelect,
   selectedIndex,
+  tabIndex,
 }: EventListProps) => {
   const getColor = (eventFlags: EventFlags) => {
     if (eventFlags.fill) {
@@ -28,13 +31,17 @@ export const EventList = ({
   }
 
   return (
-    <div className="w-full px-4 flex space-between space-x-2">
+    <div className="w-full flex space-between items-center space-x-2">
       {displayEvents.map((event, i) => (
         <div
           key={`${event.orderId.toString()} - ${i}`}
-          className={`h-10 flex-1 rounded cursor-pointer ${
-            selectedIndex === i ? "border-2 border-cyan-400" : null
-          } ${getColor(event.eventFlags)}`}
+          className={`h-10 flex-1 rounded  ${
+            selectedIndex === i && tabIndex === 0
+              ? "border-2 border-cyan-400"
+              : null
+          } ${tabIndex === 0 ? "cursor-pointer" : null} ${getColor(
+            event.eventFlags
+          )}`}
           onClick={() => onSelect(i)}
         />
       ))}
