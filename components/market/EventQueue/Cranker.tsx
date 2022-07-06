@@ -19,12 +19,7 @@ export const Cranker = () => {
 
   const { eventQueue, serumMarket } = useMarket();
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = useForm<CrankInputs>();
+  const { register, handleSubmit } = useForm<CrankInputs>();
 
   const onSubmit: SubmitHandler<CrankInputs> = async (data) => {
     const eq = await eventQueue.mutate();
@@ -47,22 +42,34 @@ export const Cranker = () => {
     const tx = new Transaction();
     tx.add(serumMarket.makeConsumeEventsInstruction(orderedAccounts, 65535));
 
-    const txSig = await wallet.sendTransaction(tx, connection);
-    await connection.confirmTransaction(txSig);
+    try {
+      const txSig = await wallet.sendTransaction(tx, connection);
 
-    toast(() => (
-      <div className="flex flex-col space-y-1">
-        <p>Successfully cranked {data.numEvents} events</p>
-        <a
-          href={getExplorerLink(txSig, cluster.network)}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="italic"
-        >
-          View transaction
-        </a>
-      </div>
-    ));
+      toast(() => (
+        <div className="flex flex-col space-y-1">
+          <p>Cranking {orderedAccounts.length} events.</p>
+        </div>
+      ));
+
+      await connection.confirmTransaction(txSig);
+
+      toast(() => (
+        <div className="flex flex-col space-y-1">
+          <p>Successfully cranked {orderedAccounts.length} events</p>
+          <a
+            href={getExplorerLink(txSig, cluster.network)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="italic font-light text-sm"
+          >
+            View transaction
+          </a>
+        </div>
+      ));
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to crank. See console for details.");
+    }
   };
 
   return (
@@ -71,7 +78,7 @@ export const Cranker = () => {
         <div className="w-full flex justify-center">
           <button
             onClick={() => setVisible(true)}
-            className="w-full max-w-md p-2 bg-cyan-600 rounded-md"
+            className="w-full p-2 bg-cyan-600 hover:bg-cyan-700 transition-all rounded-md"
           >
             Connect Wallet
           </button>
@@ -83,11 +90,11 @@ export const Cranker = () => {
         >
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm font-semibold"># of Events</span>
+              <span className="text-sm font-semibold">Max no. of Events</span>
             </label>
             <input
               defaultValue={10}
-              {...register("numEvents")}
+              {...register("numEvents", { required: true })}
               className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-600 focus:outline-none"
             />
           </div>
