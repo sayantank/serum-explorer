@@ -48,7 +48,10 @@ export const WalletButton: FC<WalletButtonProps> = () => {
       >
         <li
           className={`hover:bg-cyan-800 p-2 cursor-pointer`}
-          onClick={() => wallet.disconnect()}
+          onClick={() => {
+            wallet.disconnect();
+            setShowDropdown(false);
+          }}
         >
           <div>
             <h2 className="font-medium">Disconnect</h2>

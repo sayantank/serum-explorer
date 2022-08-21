@@ -8,9 +8,12 @@ import { MarketProvider } from "../../context/market";
 import { TokenDisplay } from "../../components/market/TokenDisplay";
 import { OverviewTable } from "../../components/market/OverviewTable";
 import { VaultDisplay } from "../../components/market/Vault";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { ActionCenter } from "../../components/market/ActionCenter";
 
 const MarketPage = () => {
   const router = useRouter();
+  const wallet = useWallet();
   const { address } = router.query;
 
   // TODO: handle loading
@@ -21,12 +24,13 @@ const MarketPage = () => {
   if (!serumMarket) return <p>loading...</p>;
 
   return (
-    <MarketProvider serumMarket={serumMarket}>
+    <MarketProvider serumMarket={serumMarket} walletAddress={wallet.publicKey}>
       <div className="flex flex-col items-stretch space-y-4 my-8">
         <TokenDisplay />
         <OverviewTable />
         <VaultDisplay />
         <EventQueueCard />
+        <ActionCenter />
       </div>
     </MarketProvider>
   );

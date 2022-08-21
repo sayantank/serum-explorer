@@ -90,7 +90,9 @@ export const Cranker = () => {
         >
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm font-semibold">Max no. of Events</span>
+              <span className="text-sm text-cyan-200 font-light">
+                Max no. of Events
+              </span>
             </label>
             <input
               defaultValue={10}
