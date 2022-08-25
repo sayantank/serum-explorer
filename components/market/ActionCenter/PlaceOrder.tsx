@@ -42,7 +42,8 @@ export const PlaceOrder = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
   const { cluster } = useSolana();
-  const { quoteMint, baseMint, serumMarket } = useMarket();
+  const { quoteMint, baseMint, serumMarket, orders, openOrders, eventQueue } =
+    useMarket();
 
   const { tokenAmount: baseBalance } = useTokenBalance(
     wallet.publicKey,
@@ -112,9 +113,6 @@ export const PlaceOrder = () => {
       )
       .then((t) => t.transaction);
 
-    const recentBlockhash = await connection.getLatestBlockhash("finalized");
-    tx.recentBlockhash = recentBlockhash.blockhash;
-
     try {
       const txSig = await wallet.sendTransaction(tx, connection);
 
@@ -129,6 +127,12 @@ export const PlaceOrder = () => {
       ));
 
       await connection.confirmTransaction(txSig);
+
+      await Promise.all([
+        orders.mutate(),
+        eventQueue.mutate(),
+        openOrders.mutate(),
+      ]);
 
       toast(() => (
         <div className="flex flex-col space-y-1">

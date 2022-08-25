@@ -47,19 +47,4 @@ export const OrderListItem = ({ order }: { order: Order }) => {
       </td>
     </tr>
   );
-  return (
-    <div className="w-full flex p-3">
-      <div className="flex-1">
-        <div
-          className={classNames(
-            "flex w-min rounded-md text-sm items-center justify-center py-1 px-2",
-            order.side === "buy" ? "bg-green-500" : "bg-red-500"
-          )}
-        >
-          {order.side === "buy" ? "Buy" : "Sell"}
-        </div>
-      </div>
-      <div className="flex-1"></div>
-    </div>
-  );
 };

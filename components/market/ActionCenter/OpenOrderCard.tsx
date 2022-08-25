@@ -40,15 +40,19 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
       wallet.publicKey,
       true
     );
-    const tx = await serumMarket!.makeSettleFundsTransaction(
+    const { transaction } = await serumMarket!.makeSettleFundsTransaction(
       connection,
       openOrder,
       baseWallet,
       quoteWallet
     );
 
+    const { blockhash } = await connection.getLatestBlockhash("confirmed");
+    transaction.recentBlockhash = blockhash;
+
     try {
-      const txSig = await wallet.sendTransaction(tx.transaction, connection);
+      const txSig = await wallet.sendTransaction(transaction, connection);
+      console.log(txSig);
 
       toast(() => (
         <div className="flex flex-col space-y-1">
@@ -124,12 +128,12 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
           </p>
         </div>
       </div>
-      <div>
+      {/* <div>
         <h3 className="text-sm text-cyan-200 font-light"># of orders</h3>
         <p className="text-lg font-bold">
           {openOrder.orders.filter((o) => o.toString() !== "0").length}
         </p>
-      </div>
+      </div> */}
       <button
         className="primary-btn"
         onClick={handleSettle}
