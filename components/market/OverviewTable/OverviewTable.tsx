@@ -1,8 +1,10 @@
+import { useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
-import { EXPLORER_ADDRESS_BASE } from "../../../utils/constants";
+import { getExplorerAccountLink } from "../../../utils/general";
 import { DataTable, DataTableRow } from "../../common/DataTable";
 
 export const OverviewTable = () => {
+  const { cluster } = useSolana();
   const { serumMarket } = useMarket();
 
   if (!serumMarket) {
@@ -18,17 +20,23 @@ export const OverviewTable = () => {
         <DataTableRow
           label="Market Address"
           value={serumMarket.address.toString()}
-          link={`${EXPLORER_ADDRESS_BASE}${serumMarket.address.toString()}`}
+          link={getExplorerAccountLink(serumMarket.address, cluster.network)}
         />
         <DataTableRow
           label="Base Mint"
           value={serumMarket.baseMintAddress.toString()}
-          link={`${EXPLORER_ADDRESS_BASE}${serumMarket.baseMintAddress.toString()}`}
+          link={getExplorerAccountLink(
+            serumMarket.baseMintAddress,
+            cluster.network
+          )}
         />
         <DataTableRow
           label="Quote Mint"
           value={serumMarket.quoteMintAddress.toString()}
-          link={`${EXPLORER_ADDRESS_BASE}${serumMarket.quoteMintAddress.toString()}`}
+          link={getExplorerAccountLink(
+            serumMarket.quoteMintAddress,
+            cluster.network
+          )}
         />
         <DataTableRow
           label="Tick Size"

@@ -8,6 +8,10 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.0.0"
+  },
   "dependencies": {
     "@headlessui/react": "^1.6.5",
     "@heroicons/react": "^1.0.6",
@@ -20,6 +24,7 @@
     "@solana/wallet-adapter-wallets": "^0.16.0",
     "@solana/web3.js": "^1.41.4",
     "axios": "^0.27.2",
+    "bn.js": "^5.2.1",
     "bs58": "^5.0.0",
     "next": "12.1.6",
     "react": "18.1.0",

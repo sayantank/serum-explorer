@@ -1,11 +1,13 @@
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { PublicKey, Transaction } from "@solana/web3.js";
+import { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
 import { getExplorerLink } from "../../../utils/general";
+import { sendWalletTransaction } from "../../../utils/transaction";
 
 type CrankInputs = {
   numEvents: number;
@@ -17,7 +19,9 @@ export const Cranker = () => {
   const wallet = useWallet();
   const { setVisible } = useWalletModal();
 
-  const { eventQueue, serumMarket } = useMarket();
+  const [isCranking, setIsCranking] = useState(false);
+
+  const { eventQueue, serumMarket, openOrders } = useMarket();
 
   const { register, handleSubmit } = useForm<CrankInputs>();
 
@@ -34,24 +38,18 @@ export const Cranker = () => {
       return;
     }
 
+    setIsCranking(true);
+
     let orderedAccounts: PublicKey[] = eq
       .slice(0, data.numEvents)
       .map((e) => e.openOrders)
       .sort((a, b) => a.toBuffer().swap64().compare(b.toBuffer().swap64()));
 
-    const tx = new Transaction();
-    tx.add(serumMarket.makeConsumeEventsInstruction(orderedAccounts, 65535));
-
     try {
-      const txSig = await wallet.sendTransaction(tx, connection);
+      const tx = new Transaction();
+      tx.add(serumMarket.makeConsumeEventsInstruction(orderedAccounts, 65535));
 
-      toast(() => (
-        <div className="flex flex-col space-y-1">
-          <p>Cranking {orderedAccounts.length} events.</p>
-        </div>
-      ));
-
-      await connection.confirmTransaction(txSig);
+      const txSig = await sendWalletTransaction(connection, tx, wallet);
 
       toast(() => (
         <div className="flex flex-col space-y-1">
@@ -66,9 +64,13 @@ export const Cranker = () => {
           </a>
         </div>
       ));
+
+      await Promise.all([eventQueue.mutate(), openOrders.mutate()]);
     } catch (e) {
       console.error(e);
       toast.error("Failed to crank. See console for details.");
+    } finally {
+      setIsCranking(false);
     }
   };
 
@@ -90,7 +92,9 @@ export const Cranker = () => {
         >
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm font-semibold">Max no. of Events</span>
+              <span className="text-sm text-cyan-200 font-light">
+                Max no. of Events
+              </span>
             </label>
             <input
               defaultValue={10}
@@ -100,7 +104,7 @@ export const Cranker = () => {
           </div>
           <button
             type="submit"
-            disabled={eventQueue.data?.length === 0}
+            disabled={isCranking || eventQueue.data?.length === 0}
             className="w-full p-2 bg-cyan-600 hover:bg-cyan-700 transition-all font-semibold rounded-md disabled:opacity-50 disabled:hover:bg-cyan-600"
           >
             Crank

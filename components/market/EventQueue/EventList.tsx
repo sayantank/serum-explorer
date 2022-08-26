@@ -1,6 +1,5 @@
 import { Event } from "@project-serum/serum/lib/queue";
 import { Dispatch, SetStateAction } from "react";
-import { classNames } from "../../../utils/general";
 import { EventFlags } from "./EventData";
 
 type EventListProps = {
