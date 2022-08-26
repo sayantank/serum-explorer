@@ -328,6 +328,8 @@ export const PlaceOrder = () => {
             !quoteMint ||
             !baseMint ||
             !serumMarket ||
+            !baseBalance ||
+            !quoteBalance ||
             baseBalance?.uiAmount === 0 ||
             quoteBalance?.uiAmount === 0
           }
