@@ -9,6 +9,8 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useSolana } from "../../../context";
 import { useTokenBalance } from "../../../hooks";
 import { getAssociatedTokenAddress } from "@solana/spl-token-2";
+import { sendWalletTransaction } from "../../../utils/transaction";
+import Loader from "../../common/Loader";
 
 type LabelValue<T> = {
   label: string;
@@ -54,6 +56,8 @@ export const PlaceOrder = () => {
     quoteMint?.address
   );
 
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
   const { register, handleSubmit, watch, setValue } = useForm<PlaceOrderInputs>(
     {
       defaultValues: {
@@ -87,6 +91,8 @@ export const PlaceOrder = () => {
       return;
     }
 
+    setIsSubmitting(true);
+
     const payer =
       data.side === "sell"
         ? await getAssociatedTokenAddress(baseMint!.address, wallet.publicKey)
@@ -95,36 +101,26 @@ export const PlaceOrder = () => {
       throw new Error("Need an SPL token account for cost currency as payer");
     }
 
-    const tx = await serumMarket!
-      .makePlaceOrderTransaction(
-        connection,
-        {
-          owner: wallet.publicKey,
-          payer,
-          side: data.side,
-          price: parseFloat(data.price),
-          size: parseFloat(data.size),
-          orderType: data.orderType.value,
-          selfTradeBehavior: data.selfTradeBehaviour.value,
-          feeDiscountPubkey: null,
-        },
-        120_000,
-        120_000
-      )
-      .then((t) => t.transaction);
-
     try {
-      const txSig = await wallet.sendTransaction(tx, connection);
+      let tx = await serumMarket!
+        .makePlaceOrderTransaction(
+          connection,
+          {
+            owner: wallet.publicKey,
+            payer,
+            side: data.side,
+            price: parseFloat(data.price),
+            size: parseFloat(data.size),
+            orderType: data.orderType.value,
+            selfTradeBehavior: data.selfTradeBehaviour.value,
+            feeDiscountPubkey: null,
+          },
+          120_000,
+          120_000
+        )
+        .then((t) => t.transaction);
 
-      toast(() => (
-        <div className="flex flex-col space-y-1">
-          <p>
-            Placing order to <span>{data.side === "buy" ? "BUY" : "SELL"}</span>{" "}
-            <span>{data.size}</span> base tokens at price{" "}
-            <span>{data.price}</span>
-          </p>
-        </div>
-      ));
+      const txSig = await sendWalletTransaction(connection, tx, wallet);
 
       await connection.confirmTransaction(txSig);
 
@@ -149,7 +145,9 @@ export const PlaceOrder = () => {
       ));
     } catch (e) {
       console.error(e);
-      toast.error("Error placing order. See console.for details.");
+      toast.error("Error placing order. See console for details.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -326,15 +324,22 @@ export const PlaceOrder = () => {
         <button
           type="submit"
           disabled={
+            isSubmitting ||
             !quoteMint ||
             !baseMint ||
             !serumMarket ||
             baseBalance?.uiAmount === 0 ||
             quoteBalance?.uiAmount === 0
           }
-          className="primary-btn"
+          className="primary-btn flex items-center justify-center space-x-2"
         >
-          Place Order
+          {isSubmitting ? (
+            <>
+              <Loader /> Placing Order
+            </>
+          ) : (
+            <>Place Order</>
+          )}
         </button>
       </form>
     </div>
