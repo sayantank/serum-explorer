@@ -102,8 +102,8 @@ export const PlaceOrder = () => {
     }
 
     try {
-      let tx = await serumMarket!
-        .makePlaceOrderTransaction(
+      let { transaction, signers } =
+        await serumMarket!.makePlaceOrderTransaction(
           connection,
           {
             owner: wallet.publicKey,
@@ -117,10 +117,14 @@ export const PlaceOrder = () => {
           },
           120_000,
           120_000
-        )
-        .then((t) => t.transaction);
+        );
 
-      const txSig = await sendWalletTransaction(connection, tx, wallet);
+      const txSig = await sendWalletTransaction(
+        connection,
+        transaction,
+        wallet,
+        signers
+      );
 
       toast(() => (
         <div className="flex flex-col space-y-1">
@@ -216,7 +220,7 @@ export const PlaceOrder = () => {
             </label>
             <Listbox value={watchOrderType} onChange={setOrderType}>
               <div className="relative">
-                <Listbox.Button className="relative px-4 py-2 rounded-md bg-cyan-700 sm:w-48 min-w-full flex items-center justify-between">
+                <Listbox.Button className="relative px-4 py-2 rounded-md bg-cyan-700 sm:w-64 min-w-full flex items-center justify-between">
                   {watchOrderType.label}
                   <ChevronDownIcon className="h-5 w-5 text-cyan-300" />
                 </Listbox.Button>

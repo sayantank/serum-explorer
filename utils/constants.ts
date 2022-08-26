@@ -6,6 +6,8 @@ export const DEX_PROGRAMS: { [key: string]: string } = {
 
 export const SERUM_DEX_V3 = "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin";
 
+export const MAX_U128 = "340282366920938463463374607431768211455";
+
 // const b = Buffer.alloc(8);
 // accountFlagsLayout().encode(
 //   {

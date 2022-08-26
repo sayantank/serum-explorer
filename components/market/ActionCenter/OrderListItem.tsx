@@ -1,10 +1,71 @@
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { Order } from "@project-serum/serum/lib/market";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { MouseEventHandler, useState } from "react";
+import { toast } from "react-toastify";
 import { useSolana } from "../../../context";
-import { classNames, getExplorerAccountLink } from "../../../utils/general";
+import { useMarket } from "../../../context/market";
+import {
+  classNames,
+  getExplorerAccountLink,
+  getExplorerLink,
+} from "../../../utils/general";
+import { sendWalletTransaction } from "../../../utils/transaction";
+import Loader from "../../common/Loader";
 
 export const OrderListItem = ({ order }: { order: Order }) => {
+  const { connection } = useConnection();
   const { cluster } = useSolana();
+  const wallet = useWallet();
+  const { serumMarket, orders, eventQueue, openOrders } = useMarket();
+
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const handleCancel: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault();
+
+    if (!wallet || !wallet.publicKey) {
+      toast.error("Please connect your wallet.");
+      return;
+    }
+
+    try {
+      setIsCancelling(true);
+      const tx = await serumMarket!.makeCancelOrderTransaction(
+        connection,
+        wallet.publicKey,
+        order
+      );
+
+      const txSig = await sendWalletTransaction(connection, tx, wallet);
+
+      toast(() => (
+        <div className="flex flex-col space-y-1">
+          <p>Successfully cancelled order.</p>
+          <a
+            href={getExplorerLink(txSig, cluster.network)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="italic font-light text-sm"
+          >
+            View transaction
+          </a>
+        </div>
+      ));
+
+      await Promise.all([
+        orders.mutate(),
+        eventQueue.mutate(),
+        openOrders.mutate(),
+      ]);
+    } catch (e) {
+      console.error(e);
+      toast.error("Failed to cancel order. See console for details.");
+    } finally {
+      setIsCancelling(false);
+    }
+  };
+
   return (
     <tr>
       <td className="p-2">
@@ -41,8 +102,18 @@ export const OrderListItem = ({ order }: { order: Order }) => {
         </div>
       </td>
       <td className="p-2 flex">
-        <button className="py-1 text-sm px-4 w-min bg-cyan-700 hover:bg-cyan-800 transition-colors rounded-md">
-          Cancel
+        <button
+          onClick={handleCancel}
+          className="py-1 text-sm px-3 w-min bg-cyan-700 hover:bg-cyan-800 transition-colors rounded-md flex items-center justify-center space-x-1"
+          disabled={isCancelling || !serumMarket}
+        >
+          {isCancelling ? (
+            <>
+              <Loader /> Cancelling
+            </>
+          ) : (
+            <>Cancel</>
+          )}
         </button>
       </td>
     </tr>

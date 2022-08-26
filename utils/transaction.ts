@@ -17,7 +17,7 @@ export async function sendWalletTransaction(
   tx.feePayer = wallet.publicKey;
 
   tx = await wallet.signTransaction!(tx);
-  if (signers) tx.partialSign(...signers);
+  if (signers && signers.length > 0) tx.partialSign(...signers);
 
   const txSig = await connection.sendRawTransaction(await tx.serialize());
 

@@ -15,6 +15,7 @@ import { sendWalletTransaction } from "../../../utils/transaction";
 import Loader from "../../common/Loader";
 import BN from "bn.js";
 import { Transaction } from "@solana/web3.js";
+import { MAX_U128 } from "../../../utils/constants";
 
 type OpenOrderCardProps = {
   openOrder: OpenOrders;
@@ -34,12 +35,14 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
     orders,
   } = useMarket();
 
+  const canSettle =
+    openOrder.baseTokenFree.gt(new BN(0)) ||
+    openOrder.quoteTokenFree.gt(new BN(0));
   const [isSettling, setIsSettling] = useState(false);
 
   const [isClosing, setIsClosing] = useState(false);
   const canClose =
-    openOrder.baseTokenFree.eq(new BN(0)) &&
-    openOrder.quoteTokenFree.eq(new BN(0)) &&
+    !canSettle &&
     !orders.data?.filter(
       (o) => o.openOrdersAddress.toBase58() == openOrder.address.toBase58()
     ).length;
@@ -49,6 +52,13 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
 
     if (!wallet || !wallet.publicKey) {
       toast.error("Please connect your wallet.");
+      return;
+    }
+
+    if (openOrder.freeSlotBits.toString() !== MAX_U128) {
+      toast.error(
+        "Funds are still associated with this OpenOrder account. Try cranking."
+      );
       return;
     }
 
@@ -124,8 +134,6 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
       const tx = new Transaction().add(ix);
       const txSig = await sendWalletTransaction(connection, tx, wallet);
 
-      await connection.confirmTransaction(txSig);
-
       toast(() => (
         <div className="flex flex-col space-y-1">
           <p>Successfully closed OpenOrder account.</p>
@@ -198,7 +206,9 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
       <button
         className="primary-btn"
         onClick={handleSettle}
-        disabled={isSettling || !serumMarket || !baseMint || !quoteMint}
+        disabled={
+          !canSettle || isSettling || !serumMarket || !baseMint || !quoteMint
+        }
       >
         {isSettling ? (
           <>
