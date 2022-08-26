@@ -11,5 +11,9 @@ body {
 }
 
 .primary-btn {
-    @apply w-full p-2 bg-cyan-600 hover:bg-cyan-700 transition-all font-semibold rounded-md disabled:opacity-50 disabled:hover:bg-cyan-600
+    @apply w-full p-2 bg-cyan-600 hover:bg-cyan-700 transition-all font-semibold rounded-md flex items-center justify-center space-x-2 disabled:opacity-50 disabled:hover:bg-cyan-600
+}
+
+.critical-btn {
+    @apply w-full p-2 bg-red-500 hover:bg-red-600 transition-all font-semibold rounded-md flex items-center justify-center space-x-2 disabled:opacity-50 disabled:hover:bg-red-500
 }

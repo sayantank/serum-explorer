@@ -122,14 +122,6 @@ export const PlaceOrder = () => {
 
       const txSig = await sendWalletTransaction(connection, tx, wallet);
 
-      await connection.confirmTransaction(txSig);
-
-      await Promise.all([
-        orders.mutate(),
-        eventQueue.mutate(),
-        openOrders.mutate(),
-      ]);
-
       toast(() => (
         <div className="flex flex-col space-y-1">
           <p>Successfully placed order.</p>
@@ -143,6 +135,12 @@ export const PlaceOrder = () => {
           </a>
         </div>
       ));
+
+      await Promise.all([
+        orders.mutate(),
+        eventQueue.mutate(),
+        openOrders.mutate(),
+      ]);
     } catch (e) {
       console.error(e);
       toast.error("Error placing order. See console for details.");
@@ -333,7 +331,7 @@ export const PlaceOrder = () => {
             baseBalance?.uiAmount === 0 ||
             quoteBalance?.uiAmount === 0
           }
-          className="primary-btn flex items-center justify-center space-x-2"
+          className="primary-btn"
         >
           {isSubmitting ? (
             <>

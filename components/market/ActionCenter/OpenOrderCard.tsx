@@ -1,7 +1,7 @@
-import { MouseEvent, MouseEventHandler } from "react";
+import { MouseEvent, MouseEventHandler, useState } from "react";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
-import { OpenOrders } from "@project-serum/serum";
-import { useSolana } from "../../../context";
+import { DexInstructions, OpenOrders } from "@project-serum/serum";
+import { useSerum, useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
 import {
   getExplorerAccountLink,
@@ -11,6 +11,10 @@ import { tokenAtomicsToPrettyDecimal } from "../../../utils/numerical";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { toast } from "react-toastify";
 import { getAssociatedTokenAddress } from "@solana/spl-token-2";
+import { sendWalletTransaction } from "../../../utils/transaction";
+import Loader from "../../common/Loader";
+import BN from "bn.js";
+import { Transaction } from "@solana/web3.js";
 
 type OpenOrderCardProps = {
   openOrder: OpenOrders;
@@ -19,8 +23,26 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   const { connection } = useConnection();
   const wallet = useWallet();
   const { cluster } = useSolana();
-  const { baseMetadata, quoteMetadata, baseMint, quoteMint, serumMarket } =
-    useMarket();
+  const { programID } = useSerum();
+  const {
+    baseMetadata,
+    quoteMetadata,
+    baseMint,
+    quoteMint,
+    serumMarket,
+    openOrders,
+    orders,
+  } = useMarket();
+
+  const [isSettling, setIsSettling] = useState(false);
+
+  const [isClosing, setIsClosing] = useState(false);
+  const canClose =
+    openOrder.baseTokenFree.eq(new BN(0)) &&
+    openOrder.quoteTokenFree.eq(new BN(0)) &&
+    !orders.data?.filter(
+      (o) => o.openOrdersAddress.toBase58() == openOrder.address.toBase58()
+    ).length;
 
   const handleSettle: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
@@ -29,6 +51,8 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
       toast.error("Please connect your wallet.");
       return;
     }
+
+    setIsSettling(true);
 
     const baseWallet = await getAssociatedTokenAddress(
       baseMint!.address,
@@ -40,30 +64,20 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
       wallet.publicKey,
       true
     );
-    const { transaction } = await serumMarket!.makeSettleFundsTransaction(
-      connection,
-      openOrder,
-      baseWallet,
-      quoteWallet
-    );
-
-    const { blockhash } = await connection.getLatestBlockhash("confirmed");
-    transaction.recentBlockhash = blockhash;
 
     try {
-      const txSig = await wallet.sendTransaction(transaction, connection);
-      console.log(txSig);
+      const { transaction } = await serumMarket!.makeSettleFundsTransaction(
+        connection,
+        openOrder,
+        baseWallet,
+        quoteWallet
+      );
 
-      toast(() => (
-        <div className="flex flex-col space-y-1">
-          <p>
-            Settling funds for OpenOrder account,{" "}
-            {openOrder.address.toString().slice(0, 6)}...
-          </p>
-        </div>
-      ));
-
-      await connection.confirmTransaction(txSig);
+      const txSig = await sendWalletTransaction(
+        connection,
+        transaction,
+        wallet
+      );
 
       toast(() => (
         <div className="flex flex-col space-y-1">
@@ -78,9 +92,62 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
           </a>
         </div>
       ));
+
+      await openOrders.mutate();
     } catch (e) {
       console.error(e);
       toast.error("Failed to settle funds. See console for details.");
+    } finally {
+      setIsSettling(false);
+    }
+  };
+
+  const handleClose: MouseEventHandler<HTMLButtonElement> = async (e) => {
+    e.preventDefault();
+
+    if (!wallet || !wallet.publicKey) {
+      toast.error("Please connect your wallet.");
+      return;
+    }
+
+    try {
+      setIsClosing(true);
+
+      const ix = DexInstructions.closeOpenOrders({
+        market: serumMarket!.address,
+        openOrders: openOrder.address,
+        owner: wallet.publicKey,
+        solWallet: wallet.publicKey,
+        programId: programID,
+      });
+
+      const tx = new Transaction().add(ix);
+      const txSig = await sendWalletTransaction(connection, tx, wallet);
+
+      await connection.confirmTransaction(txSig);
+
+      toast(() => (
+        <div className="flex flex-col space-y-1">
+          <p>Successfully closed OpenOrder account.</p>
+          <a
+            href={getExplorerLink(txSig, cluster.network)}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="italic font-light text-sm"
+          >
+            View transaction
+          </a>
+        </div>
+      ));
+
+      await openOrders.mutate();
+    } catch (e) {
+      console.error(e);
+      toast.error(
+        "Failed to close OpenOrder account. See console for details."
+      );
+    } finally {
+      setIsClosing(false);
     }
   };
 
@@ -128,18 +195,31 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
           </p>
         </div>
       </div>
-      {/* <div>
-        <h3 className="text-sm text-cyan-200 font-light"># of orders</h3>
-        <p className="text-lg font-bold">
-          {openOrder.orders.filter((o) => o.toString() !== "0").length}
-        </p>
-      </div> */}
       <button
         className="primary-btn"
         onClick={handleSettle}
-        disabled={!serumMarket || !baseMint || !quoteMint}
+        disabled={isSettling || !serumMarket || !baseMint || !quoteMint}
       >
-        Settle
+        {isSettling ? (
+          <>
+            <Loader /> Settling
+          </>
+        ) : (
+          <>Settle</>
+        )}
+      </button>
+      <button
+        className="critical-btn"
+        onClick={handleClose}
+        disabled={!canClose || !serumMarket}
+      >
+        {isClosing ? (
+          <>
+            <Loader /> Closing
+          </>
+        ) : (
+          <>Close</>
+        )}
       </button>
     </div>
   );

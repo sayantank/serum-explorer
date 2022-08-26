@@ -19,5 +19,13 @@ export async function sendWalletTransaction(
   tx = await wallet.signTransaction!(tx);
   if (signers) tx.partialSign(...signers);
 
-  return await connection.sendRawTransaction(await tx.serialize());
+  const txSig = await connection.sendRawTransaction(await tx.serialize());
+
+  await connection.confirmTransaction({
+    signature: txSig,
+    blockhash,
+    lastValidBlockHeight,
+  });
+
+  return txSig;
 }
