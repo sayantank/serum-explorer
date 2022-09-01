@@ -10,11 +10,14 @@ import { OverviewTable } from "../../components/market/OverviewTable";
 import { VaultDisplay } from "../../components/market/Vault";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ActionCenter } from "../../components/market/ActionCenter";
+import { useSolana } from "../../context";
 
 const MarketPage = () => {
   const router = useRouter();
   const wallet = useWallet();
   const { address } = router.query;
+
+  const { cluster } = useSolana();
 
   // TODO: handle loading
   const [pageLoading, setPageLoading] = useState(true);
@@ -30,7 +33,7 @@ const MarketPage = () => {
         <OverviewTable />
         <VaultDisplay />
         <EventQueueCard />
-        <ActionCenter />
+        {cluster.network !== "mainnet-beta" && <ActionCenter />}
       </div>
     </MarketProvider>
   );
