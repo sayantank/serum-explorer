@@ -1,4 +1,4 @@
-import { MouseEvent, MouseEventHandler, useState } from "react";
+import { MouseEventHandler, useState } from "react";
 import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { DexInstructions, OpenOrders } from "@project-serum/serum";
 import { useSerum, useSolana } from "../../../context";
@@ -50,6 +50,8 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   const handleSettle: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
 
+    if (!baseMint || !quoteMint || !serumMarket || !openOrders) return;
+
     if (!wallet || !wallet.publicKey) {
       toast.error("Please connect your wallet.");
       return;
@@ -65,18 +67,18 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
     setIsSettling(true);
 
     const baseWallet = await getAssociatedTokenAddress(
-      baseMint!.address,
+      baseMint.address,
       wallet.publicKey,
       true
     );
     const quoteWallet = await getAssociatedTokenAddress(
-      quoteMint!.address,
+      quoteMint.address,
       wallet.publicKey,
       true
     );
 
     try {
-      const { transaction } = await serumMarket!.makeSettleFundsTransaction(
+      const { transaction } = await serumMarket.makeSettleFundsTransaction(
         connection,
         openOrder,
         baseWallet,
@@ -115,6 +117,8 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   const handleClose: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
 
+    if (!serumMarket) return;
+
     if (!wallet || !wallet.publicKey) {
       toast.error("Please connect your wallet.");
       return;
@@ -124,7 +128,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
       setIsClosing(true);
 
       const ix = DexInstructions.closeOpenOrders({
-        market: serumMarket!.address,
+        market: serumMarket.address,
         openOrders: openOrder.address,
         owner: wallet.publicKey,
         solWallet: wallet.publicKey,

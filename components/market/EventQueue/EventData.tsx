@@ -1,5 +1,4 @@
 import { Event } from "@project-serum/serum/lib/queue";
-import { useEffect } from "react";
 import { useMarket } from "../../../context/market";
 import { tokenAtomicsToPrettyDecimal } from "../../../utils/numerical";
 import { DataTable, DataTableRow } from "../../common/DataTable";

@@ -1,17 +1,10 @@
-import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useRef, useState } from "react";
 import { KeyIcon } from "@heroicons/react/outline";
-import {
-  CLUSTERS,
-  CUSTOM_RPC_CLUSTER,
-  useSolana,
-} from "../../../context/SolanaContext";
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 
-type WalletButtonProps = {};
-
-export const WalletButton: FC<WalletButtonProps> = () => {
+export const WalletButton: FC = () => {
   const wallet = useWallet();
   const { visible, setVisible } = useWalletModal();
 
@@ -33,8 +26,8 @@ export const WalletButton: FC<WalletButtonProps> = () => {
         className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded"
       >
         <div className="md:block hidden py-2 px-4">
-          {wallet.connected
-            ? `${wallet.publicKey!.toString().slice(0, 6)}...`
+          {wallet.connected && wallet.publicKey
+            ? `${wallet.publicKey.toString().slice(0, 6)}...`
             : "Connect"}
         </div>
         <div className="md:hidden p-2">

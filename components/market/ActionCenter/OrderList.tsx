@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useMarket } from "../../../context/market";
 import { OrderListItem } from "./OrderListItem";
 

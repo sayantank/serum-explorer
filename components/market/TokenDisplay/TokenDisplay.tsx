@@ -1,8 +1,7 @@
-import { useEffect } from "react";
 import { useMarket } from "../../../context/market";
 
 export const TokenDisplay = () => {
-  const { serumMarket, baseMetadata, quoteMetadata } = useMarket();
+  const { baseMetadata, quoteMetadata } = useMarket();
 
   if (!baseMetadata || !quoteMetadata) {
     return null;
