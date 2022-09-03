@@ -13,9 +13,7 @@ import { clusterApiUrl, Connection } from "@solana/web3.js";
 import { useRouter } from "next/router";
 import {
   createContext,
-  Dispatch,
   ReactNode,
-  SetStateAction,
   useContext,
   useEffect,
   useMemo,

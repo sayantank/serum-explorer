@@ -5,7 +5,6 @@ const {
 
 import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
-import { toast } from "react-toastify";
 import useSWR from "swr";
 
 const fetcher = async (

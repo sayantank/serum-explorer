@@ -1,5 +1,5 @@
 import { Market, OpenOrders } from "@project-serum/serum";
-import { createContext, ReactNode, useContext, useEffect } from "react";
+import { createContext, ReactNode, useContext } from "react";
 import { useMetaplexMetadata, useSPLToken } from "../../hooks";
 import { programs } from "@metaplex/js";
 import { Mint } from "@solana/spl-token-2";
@@ -11,7 +11,7 @@ import { Order } from "@project-serum/serum/lib/market";
 
 type MarketData<T> = {
   data?: T;
-  error: any;
+  error: unknown;
   isLoading: boolean;
   mutate: KeyedMutator<T>;
   isValidating: boolean;

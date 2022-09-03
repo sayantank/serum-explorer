@@ -8,9 +8,7 @@ import {
 import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
 import { toast } from "react-toastify";
 
-type SettingButtonProps = {};
-
-export const SettingsButton: FC<SettingButtonProps> = () => {
+export const SettingsButton: FC = () => {
   const { setCustomEndpoint, cluster, setCluster, isActiveCluster } =
     useSolana();
 

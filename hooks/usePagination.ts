@@ -1,4 +1,3 @@
-import { Console } from "console";
 import { useEffect, useState } from "react";
 import { serumMarketFilter } from "../utils/filters";
 

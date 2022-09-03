@@ -24,6 +24,8 @@ export const OrderListItem = ({ order }: { order: Order }) => {
   const handleCancel: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
 
+    if (!serumMarket) return;
+
     if (!wallet || !wallet.publicKey) {
       toast.error("Please connect your wallet.");
       return;
@@ -31,7 +33,7 @@ export const OrderListItem = ({ order }: { order: Order }) => {
 
     try {
       setIsCancelling(true);
-      const tx = await serumMarket!.makeCancelOrderTransaction(
+      const tx = await serumMarket.makeCancelOrderTransaction(
         connection,
         wallet.publicKey,
         order

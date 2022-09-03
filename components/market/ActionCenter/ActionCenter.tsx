@@ -1,6 +1,4 @@
 import { useWallet } from "@solana/wallet-adapter-react";
-import { useMarket } from "../../../context/market";
-import { useTokenBalance } from "../../../hooks";
 import OpenOrdersGrid from "./OpenOrdersGrid";
 import { OrderList } from "./OrderList";
 import { PlaceOrder } from "./PlaceOrder";

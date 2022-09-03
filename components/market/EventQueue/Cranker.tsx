@@ -40,7 +40,7 @@ export const Cranker = () => {
 
     setIsCranking(true);
 
-    let orderedAccounts: PublicKey[] = eq
+    const orderedAccounts: PublicKey[] = eq
       .slice(0, data.numEvents)
       .map((e) => e.openOrders)
       .sort((a, b) => a.toBuffer().swap64().compare(b.toBuffer().swap64()));

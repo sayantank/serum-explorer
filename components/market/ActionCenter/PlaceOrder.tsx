@@ -86,6 +86,8 @@ export const PlaceOrder = () => {
   };
 
   const handlePlaceOrder: SubmitHandler<PlaceOrderInputs> = async (data) => {
+    if (!baseMint || !quoteMint || !serumMarket) return;
+
     if (!wallet || !wallet.publicKey) {
       toast.error("No wallet selected.");
       return;
@@ -95,15 +97,15 @@ export const PlaceOrder = () => {
 
     const payer =
       data.side === "sell"
-        ? await getAssociatedTokenAddress(baseMint!.address, wallet.publicKey)
-        : await getAssociatedTokenAddress(quoteMint!.address, wallet.publicKey);
+        ? await getAssociatedTokenAddress(baseMint.address, wallet.publicKey)
+        : await getAssociatedTokenAddress(quoteMint.address, wallet.publicKey);
     if (!payer) {
       throw new Error("Need an SPL token account for cost currency as payer");
     }
 
     try {
-      let { transaction, signers } =
-        await serumMarket!.makePlaceOrderTransaction(
+      const { transaction, signers } =
+        await serumMarket.makePlaceOrderTransaction(
           connection,
           {
             owner: wallet.publicKey,

@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import { getLayout } from "../../components/layouts/SiteLayout";
 import { useSerumMarket } from "../../hooks/useSerumMarket";
 
@@ -20,7 +20,7 @@ const MarketPage = () => {
   const { cluster } = useSolana();
 
   // TODO: handle loading
-  const [pageLoading, setPageLoading] = useState(true);
+  // const [pageLoading, setPageLoading] = useState(true);
 
   const { serumMarket } = useSerumMarket(address as string);
 

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { FC } from "react";
@@ -6,9 +5,7 @@ import { useSolana } from "../../context/SolanaContext";
 import { SettingsButton } from "./SettingsButton";
 import { WalletButton } from "./WalletButton";
 
-type HeaderProps = {};
-
-const Header: FC<HeaderProps> = () => {
+const Header: FC = () => {
   const router = useRouter();
   const { cluster } = useSolana();
 

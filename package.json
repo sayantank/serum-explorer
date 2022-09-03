@@ -37,11 +37,13 @@
     "@types/node": "^17.0.31",
     "@types/react": "18.0.8",
     "@types/react-dom": "18.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.36.1",
+    "@typescript-eslint/parser": "^5.36.1",
     "autoprefixer": "^10.4.7",
     "eslint": "8.14.0",
     "eslint-config-next": "12.1.6",
     "postcss": "^8.4.13",
     "tailwindcss": "^3.0.24",
-    "typescript": "4.6.4"
+    "typescript": "^4.8.2"
   }
 }
