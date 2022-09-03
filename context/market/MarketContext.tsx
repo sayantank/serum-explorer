@@ -11,7 +11,7 @@ import { Order } from "@project-serum/serum/lib/market";
 
 type MarketData<T> = {
   data?: T;
-  error: any;
+  error: unknown;
   isLoading: boolean;
   mutate: KeyedMutator<T>;
   isValidating: boolean;
