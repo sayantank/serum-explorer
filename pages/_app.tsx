@@ -2,7 +2,7 @@ import { NextPage } from "next";
 import { AppProps } from "next/app";
 import { FC } from "react";
 import { ToastContainer } from "react-toastify";
-import { SerumProvider } from "../context/SerumContext";
+import { ProgramProvider } from "../context/SerumContext";
 import { SolanaProvider } from "../context/SolanaContext";
 
 // Use require instead of import since order matters
@@ -26,10 +26,10 @@ const App: FC<AppPropsWithLayout> = ({
 
   return (
     <SolanaProvider>
-      <SerumProvider>
+      <ProgramProvider>
         <ToastContainer theme="dark" />
         {getLayout(<Component {...pageProps} />)}
-      </SerumProvider>
+      </ProgramProvider>
     </SolanaProvider>
   );
 };

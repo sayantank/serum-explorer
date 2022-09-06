@@ -2,7 +2,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { useEffect, useState } from "react";
 import useSWR from "swr";
-import { useSerum } from "../context/SerumContext";
+import { useProgram } from "../context/SerumContext";
 import { useSolana } from "../context/SolanaContext";
 import {
   MARKET_ACCOUNT_FLAGS_B58_ENCODED,
@@ -67,7 +67,7 @@ const fetcher = async (
 export const useSerumMarkets = () => {
   const { cluster } = useSolana();
   const { connection } = useConnection();
-  const { programID } = useSerum();
+  const { programID } = useProgram();
 
   const [doesFetch, setDoesFetch] = useState(false);
 

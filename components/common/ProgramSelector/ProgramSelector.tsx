@@ -1,17 +1,19 @@
 import { TrashIcon } from "@heroicons/react/outline";
 import { FormEventHandler, useEffect, useState } from "react";
-import { useSerum } from "../../../context/SerumContext";
+import { useProgram } from "../../../context/SerumContext";
+import useProgramStore from "../../../stores/programStore";
 import { DEX_PROGRAMS } from "../../../utils/constants";
 
 export const ProgramSelector = () => {
-  const {
-    programID,
-    setProgramID,
-    pinnedPrograms,
-    pinProgram,
-    removePin,
-    isPinned,
-  } = useSerum();
+  const { programID, setProgramID } = useProgram();
+
+  const { pinProgram, pinnedPrograms, unpinProgram, isPinned } =
+    useProgramStore((s) => ({
+      pinnedPrograms: s.pinnedPrograms,
+      pinProgram: s.pinProgram,
+      unpinProgram: s.unpinProgram,
+      isPinned: s.isPinned,
+    }));
 
   const [isChanging, setIsChanging] = useState(false);
   const [customProgramID, setCustomProgramID] = useState(programID.toString());
@@ -26,7 +28,7 @@ export const ProgramSelector = () => {
 
   useEffect(() => {
     setShowPin(!isPinned(programID.toString()));
-  }, [programID, isPinned]);
+  }, [programID, isPinned, pinnedPrograms]);
 
   useEffect(() => {
     setCustomProgramID(programID.toString());
@@ -96,7 +98,7 @@ export const ProgramSelector = () => {
                   <p className="text-sm font-medium">
                     {programId.slice(0, 12)}...
                   </p>
-                  <div onClick={() => removePin(programId)}>
+                  <div onClick={() => unpinProgram(programId)}>
                     <TrashIcon className="h-5 w-5 text-cyan-500 cursor-pointer hover:text-cyan-400 transition-all" />
                   </div>
                 </button>
