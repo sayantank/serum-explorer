@@ -3,7 +3,7 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import useSWR from "swr";
-import { useSerum } from "../context/SerumContext";
+import { useProgram } from "../context/SerumContext";
 
 const fetcher = async (
   marketAddress: string,
@@ -21,7 +21,7 @@ const fetcher = async (
 
 export const useSerumMarket = (marketAddress: string | undefined) => {
   const { connection } = useConnection();
-  const { programID } = useSerum();
+  const { programID } = useProgram();
 
   const {
     data: serumMarket,
