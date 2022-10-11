@@ -3,11 +3,15 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import useSWR from "swr";
 
-const fetcher = async (
-  owner: PublicKey,
-  mint: PublicKey,
-  connection: Connection
-) => {
+const fetcher = async ({
+  connection,
+  owner,
+  mint,
+}: {
+  connection: Connection;
+  owner: PublicKey;
+  mint: PublicKey;
+}) => {
   const tokenAccount = await getAssociatedTokenAddress(mint, owner, true);
   return connection.getTokenAccountBalance(tokenAccount);
 };
@@ -16,7 +20,7 @@ export const useTokenBalance = (owner?: PublicKey | null, mint?: PublicKey) => {
   const { connection } = useConnection();
 
   const { data, error, isValidating, mutate } = useSWR(
-    () => owner && mint && [owner, mint, connection],
+    () => owner && mint && { owner, mint, connection },
     fetcher,
     {
       errorRetryCount: 1,

@@ -7,10 +7,13 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection } from "@solana/web3.js";
 import useSWR from "swr";
 
-const fetcher = async (
-  mint: string,
-  connection: Connection
-): Promise<programs.metadata.Metadata> => {
+const fetcher = async ({
+  mint,
+  connection,
+}: {
+  mint: string;
+  connection: Connection;
+}): Promise<programs.metadata.Metadata> => {
   const metadata = await Metadata.load(
     connection,
     await Metadata.getPDA(mint ? mint : "")
@@ -26,17 +29,21 @@ export const useMetaplexMetadata = (mint?: string) => {
     error,
     isValidating,
     mutate,
-  } = useSWR(() => mint && connection && [mint, connection], fetcher, {
-    revalidateOnFocus: false,
-    // revalidateOnMount: false,
-    // shouldRetryOnError: false,
-    errorRetryCount: 1,
-    onError: (err) => {
-      console.error(err);
-      // NOTE: Decided not to show snackbar for unavailable metadata.
-      // toast.error("Failed to load Token Metadata.");
-    },
-  });
+  } = useSWR(
+    () => mint && connection && { type: "metaplex", mint, connection },
+    fetcher,
+    {
+      revalidateOnFocus: false,
+      // revalidateOnMount: false,
+      // shouldRetryOnError: false,
+      errorRetryCount: 1,
+      onError: (err) => {
+        console.error(err);
+        // NOTE: Decided not to show snackbar for unavailable metadata.
+        // toast.error("Failed to load Token Metadata.");
+      },
+    }
+  );
 
   const loading = !metadata && !error;
 

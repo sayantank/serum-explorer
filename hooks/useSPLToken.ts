@@ -4,10 +4,13 @@ import useSWR from "swr";
 import { getMint, Mint } from "@solana/spl-token-2";
 import { toast } from "react-toastify";
 
-const fetcher = async (
-  mintAddress: PublicKey,
-  connection: Connection
-): Promise<Mint> => {
+const fetcher = async ({
+  connection,
+  mintAddress,
+}: {
+  connection: Connection;
+  mintAddress: PublicKey;
+}): Promise<Mint> => {
   const mint = await getMint(connection, mintAddress, "confirmed");
   return mint;
 };
@@ -20,7 +23,7 @@ export const useSPLToken = (mintAddress: PublicKey | undefined) => {
     error,
     isValidating,
     mutate,
-  } = useSWR(() => mintAddress && [mintAddress, connection], fetcher, {
+  } = useSWR(() => mintAddress && { mintAddress, connection }, fetcher, {
     revalidateOnFocus: false,
     // revalidateOnMount: false,
     // shouldRetryOnError: false,

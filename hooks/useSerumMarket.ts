@@ -5,11 +5,16 @@ import { toast } from "react-toastify";
 import useSWR from "swr";
 import { useProgram } from "../context/SerumContext";
 
-const fetcher = async (
-  marketAddress: string,
-  programID: PublicKey,
-  connection: Connection
-): Promise<Market> => {
+const fetcher = async ({
+  connection,
+  programID,
+  marketAddress,
+}: {
+  connection: Connection;
+  programID: PublicKey;
+  marketAddress: string;
+}): Promise<Market> => {
+  console.log("[SERUM_EXPLORER] Fetching market...");
   const market = await Market.load(
     connection,
     new PublicKey(marketAddress),
@@ -29,7 +34,8 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
     isValidating,
     mutate,
   } = useSWR(
-    () => marketAddress && programID && [marketAddress, programID, connection],
+    () =>
+      marketAddress && programID && { marketAddress, programID, connection },
     fetcher,
     {
       revalidateOnFocus: false,

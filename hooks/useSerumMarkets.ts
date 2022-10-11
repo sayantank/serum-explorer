@@ -20,12 +20,18 @@ const isLocalhost = (url: string) => {
   return url.includes("localhost") || url.includes("127.0.0.1");
 };
 
-const fetcher = async (
-  programID: PublicKey,
-  connection: Connection,
-  isLocalhost: boolean
-): Promise<SerumMarketInfo[]> => {
+const fetcher = async ({
+  connection,
+  programID,
+  isLocalhost,
+}: {
+  connection: Connection;
+  programID: PublicKey;
+  isLocalhost: boolean;
+}): Promise<SerumMarketInfo[]> => {
   let serumMarkets: SerumMarketInfo[];
+
+  console.log("[SERUM_EXPLORER] Fetching all markets...");
 
   if (isLocalhost) {
     const markets = await connection.getParsedProgramAccounts(programID, {
@@ -87,11 +93,11 @@ export const useSerumMarkets = () => {
   } = useSWR(
     doesFetch &&
       programID &&
-      connection && [
+      connection && {
         programID,
         connection,
-        isLocalhost(connection.rpcEndpoint),
-      ],
+        isLocalhost: isLocalhost(connection.rpcEndpoint),
+      },
     fetcher,
     {
       errorRetryCount: 1,

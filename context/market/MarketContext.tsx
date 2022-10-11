@@ -37,27 +37,41 @@ export type MarketProviderProps = {
 
 const MarketContext = createContext<MarketContextType | undefined>(undefined);
 
-const eventQueueFetcher = (serumMarket: Market, connection: Connection) =>
-  serumMarket.loadEventQueue(connection);
+const eventQueueFetcher = ({
+  serumMarket,
+  connection,
+}: {
+  serumMarket: Market;
+  connection: Connection;
+}) => {
+  console.log("[SERUM_EXPLORER] Fetching event queue...");
+  return serumMarket.loadEventQueue(connection);
+};
 
-const openOrdersFetcher = (
-  type: string,
-  serumMarket: Market,
-  walletAddress: PublicKey,
-  connection: Connection
-) => serumMarket.findOpenOrdersAccountsForOwner(connection, walletAddress);
+const openOrdersFetcher = ({
+  serumMarket,
+  walletAddress,
+  connection,
+}: {
+  serumMarket: Market;
+  walletAddress: PublicKey;
+  connection: Connection;
+}) => {
+  console.log("[SERUM_EXPLORER] Fetching open orders...");
+  return serumMarket.findOpenOrdersAccountsForOwner(connection, walletAddress);
+};
 
-const ordersFetcher = async (
-  type: string,
-  serumMarket: Market,
-  walletAddress: PublicKey,
-  connection: Connection
-) => {
-  const orders = await serumMarket.loadOrdersForOwner(
-    connection,
-    walletAddress
-  );
-  return orders;
+const ordersFetcher = async ({
+  serumMarket,
+  walletAddress,
+  connection,
+}: {
+  serumMarket: Market;
+  walletAddress: PublicKey;
+  connection: Connection;
+}) => {
+  console.log("[SERUM_EXPLORER] Fetching orders...");
+  return serumMarket.loadOrdersForOwner(connection, walletAddress);
 };
 
 export const MarketProvider = ({
@@ -72,7 +86,10 @@ export const MarketProvider = ({
     error: eventQueueError,
     isValidating: eventQueueIsValidating,
     mutate: eventQueueMutate,
-  } = useSWR(() => serumMarket && [serumMarket, connection], eventQueueFetcher);
+  } = useSWR(
+    () => serumMarket && { serumMarket, connection },
+    eventQueueFetcher
+  );
 
   const eventQueueLoading = !eventQueue && !eventQueueError;
 
@@ -84,8 +101,17 @@ export const MarketProvider = ({
   } = useSWR(
     () =>
       serumMarket &&
-      walletAddress && ["openOrders", serumMarket, walletAddress, connection],
-    openOrdersFetcher
+      walletAddress && {
+        type: "openOrders",
+        serumMarket,
+        walletAddress,
+        connection,
+      },
+    openOrdersFetcher,
+    {
+      errorRetryCount: 1,
+      errorRetryInterval: 5000,
+    }
   );
 
   const openOrdersLoading = !openOrders && !openOrdersError;
@@ -98,8 +124,17 @@ export const MarketProvider = ({
   } = useSWR(
     () =>
       serumMarket &&
-      walletAddress && ["orders", serumMarket, walletAddress, connection],
-    ordersFetcher
+      walletAddress && {
+        type: "orders",
+        serumMarket,
+        walletAddress,
+        connection,
+      },
+    ordersFetcher,
+    {
+      errorRetryCount: 1,
+      errorRetryInterval: 5000,
+    }
   );
 
   const ordersLoading = !orders && !ordersError;
