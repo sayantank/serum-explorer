@@ -1,14 +1,11 @@
 import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useProgram } from "../context/SerumContext";
-import { useSolana } from "../context/SolanaContext";
-import {
-  MARKET_ACCOUNT_FLAGS_B58_ENCODED,
-  SERUM_DEX_V3,
-} from "../utils/constants";
+import { ClusterType, useSolana } from "../context/SolanaContext";
+import { MARKET_ACCOUNT_FLAGS_B58_ENCODED } from "../utils/constants";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export type SerumMarketInfo = {
   address: PublicKey;
@@ -16,34 +13,30 @@ export type SerumMarketInfo = {
   quoteSymbol?: string;
 };
 
-const isLocalhost = (url: string) => {
-  return url.includes("localhost") || url.includes("127.0.0.1");
-};
-
-const fetcher = async ({
-  connection,
-  programID,
-  isLocalhost,
-}: {
-  connection: Connection;
-  programID: PublicKey;
-  isLocalhost: boolean;
-}): Promise<SerumMarketInfo[]> => {
+const fetcher = async (
+  programID: string,
+  rpcEndpoint: string,
+  cluster: ClusterType
+): Promise<SerumMarketInfo[]> => {
+  console.log(`[SERUM_EXPLORER] Fetching markets...`);
+  const connection = new Connection(rpcEndpoint);
   let serumMarkets: SerumMarketInfo[];
 
-  console.log("[SERUM_EXPLORER] Fetching all markets...");
-
-  if (isLocalhost) {
-    const markets = await connection.getParsedProgramAccounts(programID, {
-      filters: [
-        {
-          memcmp: {
-            offset: 5,
-            bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+  // if "custom", user will have to make sure their RPC provider supports getProgramAccounts
+  if (cluster !== "mainnet-beta") {
+    const markets = await connection.getParsedProgramAccounts(
+      new PublicKey(programID),
+      {
+        filters: [
+          {
+            memcmp: {
+              offset: 5,
+              bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+            },
           },
-        },
-      ],
-    });
+        ],
+      }
+    );
     serumMarkets = markets.map((m) => ({ address: m.pubkey }));
   } else {
     const { data } = await axios.get<{
@@ -75,38 +68,35 @@ export const useSerumMarkets = () => {
   const { connection } = useConnection();
   const { programID } = useProgram();
 
-  const [doesFetch, setDoesFetch] = useState(false);
-
-  useEffect(() => {
-    setDoesFetch(
-      (cluster.network === "mainnet-beta" &&
-        programID.toString() === SERUM_DEX_V3) ||
-        isLocalhost(connection.rpcEndpoint)
-    );
-  }, [cluster.network, programID, connection.rpcEndpoint]);
-
+  // FIX: Object as key doesn't seem to be working with cache, hence stringifying stuff.
   const {
     data: serumMarkets,
     isValidating,
     error,
     mutate,
   } = useSWR(
-    doesFetch &&
+    () =>
       programID &&
-      connection && {
-        programID,
-        connection,
-        isLocalhost: isLocalhost(connection.rpcEndpoint),
-      },
+      connection && [
+        programID.toBase58(),
+        connection.rpcEndpoint,
+        cluster.network,
+        "markets",
+      ],
     fetcher,
     {
       errorRetryCount: 1,
-      // revalidateOnMount: false,
-      revalidateOnFocus: false,
+      // FIX: revalidateOnMount should be false, but it wouldn't fetch on initial mount also for some reason.
+      revalidateOnFocus: cluster.network !== "mainnet-beta", // NOTE: Since mainnet-beta data is from VYBE API, we don't have to revalidate at all.
+      revalidateIfStale: false,
+      onError: (err) => {
+        console.error(err);
+        toast.error("Failed to load market.");
+      },
     }
   );
 
-  const loading = doesFetch && !serumMarkets && !error;
+  const loading = !serumMarkets && !error;
 
   return {
     serumMarkets,

@@ -9,10 +9,11 @@ const fetcher = async ({
   mintAddress,
 }: {
   connection: Connection;
-  mintAddress: PublicKey;
+  mintAddress?: PublicKey;
 }): Promise<Mint> => {
-  const mint = await getMint(connection, mintAddress, "confirmed");
-  return mint;
+  if (!mintAddress) throw new Error("No mint address provided");
+
+  return getMint(connection, mintAddress, "confirmed");
 };
 
 export const useSPLToken = (mintAddress: PublicKey | undefined) => {
@@ -23,16 +24,19 @@ export const useSPLToken = (mintAddress: PublicKey | undefined) => {
     error,
     isValidating,
     mutate,
-  } = useSWR(() => mintAddress && { mintAddress, connection }, fetcher, {
-    revalidateOnFocus: false,
-    // revalidateOnMount: false,
-    // shouldRetryOnError: false,
-    errorRetryCount: 1,
-    onError: (err) => {
-      console.error(err);
-      toast.error("Failed to SPL Token data.");
-    },
-  });
+  } = useSWR(
+    () =>
+      mintAddress && ["mint", mintAddress.toBase58(), connection.rpcEndpoint],
+    () => fetcher({ connection, mintAddress }),
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 1,
+      onError: (err) => {
+        console.error(err);
+        toast.error("Failed to SPL Token data.");
+      },
+    }
+  );
 
   const loading = !mint && !error;
 

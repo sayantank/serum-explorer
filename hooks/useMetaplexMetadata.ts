@@ -11,7 +11,7 @@ const fetcher = async ({
   mint,
   connection,
 }: {
-  mint: string;
+  mint?: string;
   connection: Connection;
 }): Promise<programs.metadata.Metadata> => {
   const metadata = await Metadata.load(
@@ -30,12 +30,12 @@ export const useMetaplexMetadata = (mint?: string) => {
     isValidating,
     mutate,
   } = useSWR(
-    () => mint && connection && { type: "metaplex", mint, connection },
-    fetcher,
+    () => mint && connection && ["metadata", mint, connection.rpcEndpoint],
+    () => fetcher({ mint, connection }),
     {
       revalidateOnFocus: false,
       // revalidateOnMount: false,
-      // shouldRetryOnError: false,
+      revalidateIfStale: false,
       errorRetryCount: 1,
       onError: (err) => {
         console.error(err);

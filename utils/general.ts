@@ -19,3 +19,7 @@ export function getExplorerAccountLink(
     cluster === "mainnet-beta" ? null : cluster
   }`;
 }
+
+export const isLocalhost = (url: string) => {
+  return url.includes("localhost") || url.includes("127.0.0.1");
+};

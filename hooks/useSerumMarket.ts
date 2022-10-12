@@ -6,21 +6,27 @@ import useSWR from "swr";
 import { useProgram } from "../context/SerumContext";
 
 const fetcher = async ({
-  connection,
-  programID,
   marketAddress,
+  programID,
+  connection,
 }: {
-  connection: Connection;
+  marketAddress?: string;
   programID: PublicKey;
-  marketAddress: string;
+  connection: Connection;
 }): Promise<Market> => {
   console.log("[SERUM_EXPLORER] Fetching market...");
+
+  if (!marketAddress) {
+    throw new Error("No market address provided");
+  }
+
   const market = await Market.load(
     connection,
     new PublicKey(marketAddress),
     { commitment: "confirmed" },
     programID
   );
+
   return market;
 };
 
@@ -35,12 +41,15 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
     mutate,
   } = useSWR(
     () =>
-      marketAddress && programID && { marketAddress, programID, connection },
-    fetcher,
+      marketAddress && [
+        "market",
+        marketAddress,
+        programID.toBase58(), // NOTE: programID kept here since we want to refetch market when programID changes
+        connection.rpcEndpoint,
+      ],
+    () => fetcher({ marketAddress, programID, connection }),
     {
       revalidateOnFocus: false,
-      // revalidateOnMount: false,
-      // shouldRetryOnError: false,
       errorRetryCount: 1,
       onError: (err) => {
         console.error(err);

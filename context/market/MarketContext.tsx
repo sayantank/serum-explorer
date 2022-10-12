@@ -41,10 +41,12 @@ const eventQueueFetcher = ({
   serumMarket,
   connection,
 }: {
-  serumMarket: Market;
+  serumMarket?: Market;
   connection: Connection;
 }) => {
   console.log("[SERUM_EXPLORER] Fetching event queue...");
+
+  if (!serumMarket) throw new Error("Serum market not found");
   return serumMarket.loadEventQueue(connection);
 };
 
@@ -53,11 +55,14 @@ const openOrdersFetcher = ({
   walletAddress,
   connection,
 }: {
-  serumMarket: Market;
-  walletAddress: PublicKey;
+  serumMarket?: Market;
+  walletAddress?: PublicKey | null;
   connection: Connection;
 }) => {
   console.log("[SERUM_EXPLORER] Fetching open orders...");
+
+  if (!serumMarket || !walletAddress)
+    throw new Error("Serum market or wallet address not found");
   return serumMarket.findOpenOrdersAccountsForOwner(connection, walletAddress);
 };
 
@@ -66,11 +71,15 @@ const ordersFetcher = async ({
   walletAddress,
   connection,
 }: {
-  serumMarket: Market;
-  walletAddress: PublicKey;
+  serumMarket?: Market;
+  walletAddress?: PublicKey | null;
   connection: Connection;
 }) => {
   console.log("[SERUM_EXPLORER] Fetching orders...");
+
+  if (!serumMarket || !walletAddress)
+    throw new Error("Serum market or wallet address not found");
+
   return serumMarket.loadOrdersForOwner(connection, walletAddress);
 };
 
@@ -81,14 +90,23 @@ export const MarketProvider = ({
 }: MarketProviderProps) => {
   const { connection } = useConnection();
 
+  // INFO: https://frontend-digest.com/dependent-and-conditional-data-fetching-with-useswr-b5178a85185
   const {
     data: eventQueue,
     error: eventQueueError,
     isValidating: eventQueueIsValidating,
     mutate: eventQueueMutate,
   } = useSWR(
-    () => serumMarket && { serumMarket, connection },
-    eventQueueFetcher
+    () =>
+      serumMarket && [
+        "eventQueue",
+        serumMarket.address.toBase58(), // NOTE: programId not required in key because one address can't be a market in two different programs (unless network is changed, which is handled below)
+        connection.rpcEndpoint, // NOTE: might not be needed, but thinking about the possibility of markets having same address in different network.
+      ],
+    () => eventQueueFetcher({ serumMarket, connection }),
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   const eventQueueLoading = !eventQueue && !eventQueueError;
@@ -101,16 +119,17 @@ export const MarketProvider = ({
   } = useSWR(
     () =>
       serumMarket &&
-      walletAddress && {
-        type: "openOrders",
-        serumMarket,
-        walletAddress,
-        connection,
-      },
-    openOrdersFetcher,
+      walletAddress && [
+        "openOrders",
+        walletAddress.toBase58(),
+        serumMarket.address.toBase58(),
+        connection.rpcEndpoint,
+      ],
+    () => openOrdersFetcher({ serumMarket, walletAddress, connection }),
     {
       errorRetryCount: 1,
       errorRetryInterval: 5000,
+      revalidateOnFocus: false,
     }
   );
 
@@ -124,16 +143,17 @@ export const MarketProvider = ({
   } = useSWR(
     () =>
       serumMarket &&
-      walletAddress && {
-        type: "orders",
-        serumMarket,
-        walletAddress,
-        connection,
-      },
-    ordersFetcher,
+      walletAddress && [
+        "orders",
+        walletAddress.toBase58(),
+        serumMarket.address.toBase58(),
+        connection.rpcEndpoint,
+      ],
+    () => ordersFetcher({ serumMarket, walletAddress, connection }),
     {
       errorRetryCount: 1,
       errorRetryInterval: 5000,
+      revalidateOnFocus: false,
     }
   );
 
