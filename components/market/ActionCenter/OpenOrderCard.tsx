@@ -1,5 +1,4 @@
 import { MouseEventHandler, useState } from "react";
-import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { DexInstructions, OpenOrders } from "@project-serum/serum";
 import { useProgram, useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
@@ -16,6 +15,7 @@ import Loader from "../../common/Loader";
 import BN from "bn.js";
 import { Transaction } from "@solana/web3.js";
 import { MAX_U128 } from "../../../utils/constants";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 type OpenOrderCardProps = {
   openOrder: OpenOrders;
@@ -178,7 +178,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer" />
           </a>
         </div>
       </div>

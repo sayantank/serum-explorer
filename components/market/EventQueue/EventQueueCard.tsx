@@ -1,4 +1,3 @@
-import { RefreshIcon } from "@heroicons/react/outline";
 import { Tab } from "@headlessui/react";
 import { Event } from "@project-serum/serum/lib/queue";
 import { Fragment, useEffect, useState } from "react";
@@ -7,6 +6,7 @@ import { EventData } from "./EventData";
 import { EventList } from "./EventList";
 import { classNames } from "../../../utils/general";
 import { Cranker } from "./Cranker";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 export const EventQueueCard = () => {
   const { eventQueue } = useMarket();
@@ -65,7 +65,7 @@ export const EventQueueCard = () => {
                     selectedIndex={selectedIndex}
                     tabIndex={tabIndex}
                   />
-                  <RefreshIcon
+                  <ArrowPathIcon
                     className={`h-5 w-5 cursor-pointer ${
                       eventQueue.isValidating ? "animate-spin" : null
                     }`}
@@ -76,7 +76,7 @@ export const EventQueueCard = () => {
             ) : (
               <div className="px-4 flex justify-between items-center w-full ">
                 <p className="text-sm font-light">No events to show.</p>
-                <RefreshIcon
+                <ArrowPathIcon
                   className={`h-5 w-5 cursor-pointer ${
                     eventQueue.isValidating ? "animate-spin" : null
                   }`}

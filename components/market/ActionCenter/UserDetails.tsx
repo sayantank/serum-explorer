@@ -1,4 +1,3 @@
-import { ExternalLinkIcon } from "@heroicons/react/outline";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
@@ -6,6 +5,7 @@ import { useTokenBalance } from "../../../hooks";
 import { getExplorerAccountLink } from "../../../utils/general";
 import { tokenAtomicsToPrettyDecimal } from "../../../utils/numerical";
 import BN from "bn.js";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 export const UserDetails = () => {
   const { cluster } = useSolana();
@@ -44,7 +44,7 @@ export const UserDetails = () => {
               target="_blank"
               rel="noopener noreferrer"
             >
-              <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+              <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer" />
             </a>
           </div>
         </div>

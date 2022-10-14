@@ -3,7 +3,10 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import useSWR from "swr";
 import { useProgram } from "../context/SerumContext";
 import { ClusterType, useSolana } from "../context/SolanaContext";
-import { MARKET_ACCOUNT_FLAGS_B58_ENCODED } from "../utils/constants";
+import {
+  MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+  SERUM_DEX_V3,
+} from "../utils/constants";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -13,32 +16,19 @@ export type SerumMarketInfo = {
   quoteSymbol?: string;
 };
 
-const fetcher = async (
-  programID: string,
-  rpcEndpoint: string,
-  cluster: ClusterType
-): Promise<SerumMarketInfo[]> => {
+const fetcher = async ({
+  programID,
+  connection,
+  cluster,
+}: {
+  programID: PublicKey;
+  connection: Connection;
+  cluster: ClusterType;
+}): Promise<SerumMarketInfo[]> => {
   console.log(`[SERUM_EXPLORER] Fetching markets...`);
-  const connection = new Connection(rpcEndpoint);
   let serumMarkets: SerumMarketInfo[];
 
-  // if "custom", user will have to make sure their RPC provider supports getProgramAccounts
-  if (cluster !== "mainnet-beta") {
-    const markets = await connection.getParsedProgramAccounts(
-      new PublicKey(programID),
-      {
-        filters: [
-          {
-            memcmp: {
-              offset: 5,
-              bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
-            },
-          },
-        ],
-      }
-    );
-    serumMarkets = markets.map((m) => ({ address: m.pubkey }));
-  } else {
+  if (cluster === "mainnet-beta" && programID.toBase58() === SERUM_DEX_V3) {
     const { data } = await axios.get<{
       tvl: number;
       total_vol_1d: number;
@@ -53,6 +43,21 @@ const fetcher = async (
       baseSymbol: m.base_symbol,
       quoteSymbol: m.quote_symbol,
     }));
+  } else {
+    const markets = await connection.getParsedProgramAccounts(
+      new PublicKey(programID),
+      {
+        filters: [
+          {
+            memcmp: {
+              offset: 5,
+              bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+            },
+          },
+        ],
+      }
+    );
+    serumMarkets = markets.map((m) => ({ address: m.pubkey }));
   }
 
   return serumMarkets;
@@ -83,15 +88,15 @@ export const useSerumMarkets = () => {
         cluster.network,
         "markets",
       ],
-    fetcher,
+    () => fetcher({ programID, connection, cluster: cluster.network }),
     {
-      errorRetryCount: 1,
       // FIX: revalidateOnMount should be false, but it wouldn't fetch on initial mount also for some reason.
-      revalidateOnFocus: cluster.network !== "mainnet-beta", // NOTE: Since mainnet-beta data is from VYBE API, we don't have to revalidate at all.
+      revalidateOnFocus: false, // NOTE: Since mainnet-beta data is from VYBE API, we don't have to revalidate at all.
       revalidateIfStale: false,
+      errorRetryCount: 1,
       onError: (err) => {
         console.error(err);
-        toast.error("Failed to load market.");
+        toast.error("Failed to load markets.");
       },
     }
   );

@@ -2,7 +2,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { classNames, getExplorerLink } from "../../../utils/general";
 import React, { Fragment } from "react";
-import { ChevronDownIcon } from "@heroicons/react/outline";
 import { toast } from "react-toastify";
 import { useMarket } from "../../../context/market";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -11,6 +10,7 @@ import { useTokenBalance } from "../../../hooks";
 import { getAssociatedTokenAddress } from "@solana/spl-token-2";
 import { sendWalletTransaction } from "../../../utils/transaction";
 import Loader from "../../common/Loader";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 type LabelValue<T> = {
   label: string;

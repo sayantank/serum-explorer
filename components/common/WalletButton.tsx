@@ -1,10 +1,10 @@
+import { KeyIcon } from "@heroicons/react/24/outline";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { FC, useRef, useState } from "react";
-import { KeyIcon } from "@heroicons/react/outline";
-import { useOutsideAlerter } from "../../../hooks/useOutsideAlerter";
+import { useOutsideAlerter } from "../../hooks/useOutsideAlerter";
 
-export const WalletButton: FC = () => {
+const WalletButton: FC = () => {
   const wallet = useWallet();
   const { visible, setVisible } = useWalletModal();
 
@@ -23,34 +23,36 @@ export const WalletButton: FC = () => {
               }
             : () => setVisible(!visible)
         }
-        className="bg-cyan-500 hover:bg-cyan-600 text-white font-bold rounded"
+        className="bg-slate-800 hover:bg-slate-700 transition-colors text-cyan-400 rounded-md"
       >
-        <div className="md:block hidden py-2 px-4">
+        <div className="md:block hidden py-2 px-4 text-sm">
           {wallet.connected && wallet.publicKey
             ? `${wallet.publicKey.toString().slice(0, 6)}...`
             : "Connect"}
         </div>
-        <div className="md:hidden p-2">
-          <KeyIcon className="h-6 w-6" />
+        <div className="md:hidden p-1.5">
+          <KeyIcon className="h-5 w-5" />
         </div>
       </button>
       <ul
         className={`${
           showDropdown ? "block" : "hidden"
-        } absolute top-full w-64 my-2 py-2 bg-cyan-900 rounded flex flex-col space-y-1`}
+        } absolute top-full w-64 my-2  bg-slate-800 py-1 border border-cyan-600 rounded flex flex-col space-y-1`}
       >
         <li
-          className={`hover:bg-cyan-800 p-2 cursor-pointer`}
+          className={`hover:bg-slate-700 p-2 cursor-pointer`}
           onClick={() => {
             wallet.disconnect();
             setShowDropdown(false);
           }}
         >
           <div>
-            <h2 className="font-medium">Disconnect</h2>
+            <h2 className="text-sm">Disconnect</h2>
           </div>
         </li>
       </ul>
     </div>
   );
 };
+
+export default WalletButton;

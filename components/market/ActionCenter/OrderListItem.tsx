@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { Order } from "@project-serum/serum/lib/market";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { MouseEventHandler, useState } from "react";
@@ -99,7 +99,7 @@ export const OrderListItem = ({ order }: { order: Order }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer" />
           </a>
         </div>
       </td>

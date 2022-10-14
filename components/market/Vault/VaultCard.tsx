@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { programs } from "@metaplex/js";
 import { Mint } from "@solana/spl-token-2";
 import { PublicKey } from "@solana/web3.js";
@@ -45,7 +45,7 @@ export const VaultCard = ({
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer" />
           </a>
         </div>
       </div>
