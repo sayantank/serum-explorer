@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { serumMarketFilter } from "../utils/filters";
+import { isSerumMarketInfo } from "../utils/typeChecks";
 
 //crayz hook
 export const usePagination = <T>(
   data: Array<T> | undefined,
   pageSize: number,
-  filterString: string
+  filterString: string,
+  filterMethod: (regexp: RegExp, row: T) => boolean
 ) => {
   const [filteredData, setFilteredData] = useState<Array<T>>([]);
   const [pageData, setPageData] = useState<Array<T> | undefined>(undefined);
@@ -14,10 +15,12 @@ export const usePagination = <T>(
 
   useEffect(() => {
     if (data) {
-      const q = new RegExp(filterString, "i");
-      setFilteredData(data.filter((row) => serumMarketFilter(q, row)));
+      if (isSerumMarketInfo(data[0])) {
+        const q = new RegExp(filterString, "i");
+        setFilteredData(data.filter((row) => filterMethod(q, row)));
+      }
     }
-  }, [filterString, data]);
+  }, [filterString, data, filterMethod]);
 
   useEffect(() => {
     if (filteredData) {

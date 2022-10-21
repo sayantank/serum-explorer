@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import {
   CLUSTERS,
   CUSTOM_RPC_CLUSTER,
-  useProgram,
+  useSerum,
   useSolana,
 } from "../../context";
 import { DEX_PROGRAMS } from "../../utils/constants";
@@ -21,7 +21,7 @@ import { prettifyPubkey } from "../../utils/pubkey";
 
 const SettingsPanel = () => {
   const wallet = useWallet();
-  const { programID, setProgramID } = useProgram();
+  const { programID, setProgramID } = useSerum();
   const { setCluster, isActiveCluster, setCustomEndpoint, cluster } =
     useSolana();
   const { setVisible } = useWalletModal();

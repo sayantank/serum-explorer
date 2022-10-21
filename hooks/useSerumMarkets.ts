@@ -1,7 +1,7 @@
 import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import useSWR from "swr";
-import { useProgram } from "../context/SerumContext";
+import { useSerum } from "../context/SerumContext";
 import { ClusterType, useSolana } from "../context/SolanaContext";
 import {
   MARKET_ACCOUNT_FLAGS_B58_ENCODED,
@@ -9,8 +9,10 @@ import {
 } from "../utils/constants";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { AccountTypes } from "../utils/typeChecks";
 
 export type SerumMarketInfo = {
+  type: AccountTypes.SerumMarketInfo;
   address: PublicKey;
   baseSymbol?: string;
   quoteSymbol?: string;
@@ -39,6 +41,7 @@ const fetcher = async ({
       }[];
     }>("https://serum-volume-tracker.vercel.app/api");
     serumMarkets = data.markets.map((m) => ({
+      type: AccountTypes.SerumMarketInfo,
       address: new PublicKey(m.market_address),
       baseSymbol: m.base_symbol,
       quoteSymbol: m.quote_symbol,
@@ -57,7 +60,10 @@ const fetcher = async ({
         ],
       }
     );
-    serumMarkets = markets.map((m) => ({ address: m.pubkey }));
+    serumMarkets = markets.map((m) => ({
+      type: AccountTypes.SerumMarketInfo,
+      address: m.pubkey,
+    }));
   }
 
   return serumMarkets;
@@ -71,7 +77,7 @@ const fetcher = async ({
 export const useSerumMarkets = () => {
   const { cluster } = useSolana();
   const { connection } = useConnection();
-  const { programID } = useProgram();
+  const { programID } = useSerum();
 
   // FIX: Object as key doesn't seem to be working with cache, hence stringifying stuff.
   const {

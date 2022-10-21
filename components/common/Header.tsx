@@ -2,27 +2,15 @@ import { Popover, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
-import { FC, FormEventHandler, Fragment, useState } from "react";
+import { FC, Fragment } from "react";
 import WalletButton from "./WalletButton";
-import {
-  Bars3Icon,
-  Cog6ToothIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/outline";
+import { Bars3Icon, Cog6ToothIcon } from "@heroicons/react/24/outline";
 import SettingsPanel from "./SettingsPanel";
 
 const Header: FC = () => {
   const router = useRouter();
-  const [marketAddress, setMarketAddress] = useState("");
+  // const { serumMarkets, loading } = useSerumMarkets();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-
-    // NOTE: If not deleted, extra ?address=xyz is added
-    delete router.query.address;
-
-    router.push({ pathname: `/market/${marketAddress}`, query: router.query });
-  };
   const sanitizeQuery = (query: ParsedUrlQuery) => {
     if (query.address) {
       delete query.address;
@@ -32,7 +20,7 @@ const Header: FC = () => {
 
   return (
     <Popover className="relative z-50">
-      <div className="flex items-center justify-between p-4 sm:px-6 md:justify-start md:space-x-6 space-x-2">
+      <div className="flex items-center justify-between p-4 sm:px-6 md:space-x-6 space-x-2 bg-slate-800 border-b border-slate-700">
         <div className="flex justify-start">
           <button
             className="text-lg  text-white no-underline text-left flex space-x-2 items-center"
@@ -49,25 +37,8 @@ const Header: FC = () => {
                 alt="Serum Explorer"
               />
             </div>
-            <p className="hidden sm:block">Explorer</p>
+            <p>Explorer</p>
           </button>
-        </div>
-        <div className="flex-1">
-          <form
-            className="flex items-center space-x-4 rounded border-2 border-cyan-600 ml-1 md:ml-0"
-            onSubmit={handleSubmit}
-          >
-            <input
-              type="text"
-              value={marketAddress}
-              onChange={(e) => setMarketAddress(e.target.value)}
-              placeholder="Market Address"
-              className="w-full px-2 bg-transparent focus:outline-none text-sm"
-            />
-            <button type="submit" className="px-4 py-2">
-              <MagnifyingGlassIcon className="h-4 w-4 text-cyan-500" />
-            </button>
-          </form>
         </div>
         <div className="md:hidden">
           <Popover.Button className="inline-flex items-center justify-center rounded-md p-1 md:p-2 text-cyan-400 hover:bg-slate-800 hover:text-cyan-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-500">
@@ -82,7 +53,7 @@ const Header: FC = () => {
                 <Popover.Button
                   className={`
                 ${open ? "" : "text-opacity-90"}
-                group inline-flex items-center rounded-md bg-slate-800 hover:bg-slate-700 px-3 py-2 text-sm text-cyan-400 hover:text-cyan-500 hover:text-opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-opacity-75 transition-colors`}
+                group inline-flex items-center rounded-md bg-slate-700 hover:bg-slate-600 px-3 py-2 text-sm text-cyan-400 hover:text-cyan-500 hover:text-opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-opacity-75 transition-colors`}
                 >
                   {/* <span>Settings</span> */}
                   <Cog6ToothIcon
@@ -91,7 +62,7 @@ const Header: FC = () => {
                     aria-hidden="true"
                   />
                 </Popover.Button>
-                <Popover.Panel className="bg-slate-800 rounded-md shadow-md border border-cyan-600 p-2 absolute right-0 z-10 mt-3 w-96 transform ">
+                <Popover.Panel className="bg-slate-800 rounded-md shadow-md border border-slate-700 p-3 absolute right-0 z-10 mt-2 w-96 transform ">
                   <SettingsPanel />
                 </Popover.Panel>
               </>
@@ -111,9 +82,9 @@ const Header: FC = () => {
       >
         <Popover.Panel
           focus
-          className="absolute w-full top-full origin-top transform transition md:hidden"
+          className="absolute w-full top-full origin-top transform transition md:hidden mt-2"
         >
-          <div className="rounded-lg bg-slate-800 border border-cyan-600 px-2 py-4 shadow-lg">
+          <div className="rounded-lg bg-slate-800 border border-slate-700 px-2 py-4 shadow-lg mx-2">
             <SettingsPanel />
           </div>
         </Popover.Panel>

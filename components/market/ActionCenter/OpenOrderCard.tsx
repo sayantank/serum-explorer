@@ -1,6 +1,6 @@
 import { MouseEventHandler, useState } from "react";
 import { DexInstructions, OpenOrders } from "@project-serum/serum";
-import { useProgram, useSolana } from "../../../context";
+import { useSerum, useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
 import {
   getExplorerAccountLink,
@@ -24,7 +24,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   const { connection } = useConnection();
   const wallet = useWallet();
   const { cluster } = useSolana();
-  const { programID } = useProgram();
+  const { programID } = useSerum();
   const {
     baseMetadata,
     quoteMetadata,

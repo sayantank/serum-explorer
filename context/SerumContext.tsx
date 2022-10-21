@@ -21,7 +21,7 @@ type ProgramProviderProps = {
 
 const ProgramContext = createContext<ProgramContextType | null>(null);
 
-export const ProgramProvider = ({ children }: ProgramProviderProps) => {
+export const SerumProvider = ({ children }: ProgramProviderProps) => {
   const router = useRouter();
 
   const [programID, _setProgramID] = useState(new PublicKey(SERUM_DEX_V3));
@@ -62,7 +62,7 @@ export const ProgramProvider = ({ children }: ProgramProviderProps) => {
   );
 };
 
-export const useProgram = () => {
+export const useSerum = () => {
   const serum = useContext(ProgramContext);
 
   if (!serum) {
