@@ -10,8 +10,8 @@ import { DEX_PROGRAMS } from "../../utils/constants";
 import { BookmarkIcon as BookmarkIconSolid } from "@heroicons/react/24/solid";
 import {
   BookmarkIcon,
-  PencilSquareIcon,
   TrashIcon,
+  PencilIcon,
 } from "@heroicons/react/24/outline";
 import useProgramStore from "../../stores/programStore";
 import { toast } from "react-toastify";
@@ -90,19 +90,21 @@ const SettingsPanel = () => {
             </p>
             <button onClick={() => handlePin(programID)}>
               {isPinned(programID.toString()) ? (
-                <BookmarkIconSolid className="text-cyan-500 h-4 w-4" />
+                <BookmarkIconSolid className="text-cyan-500 h-5 w-5" />
               ) : (
-                <BookmarkIcon className="text-cyan-500 h-4 w-4" />
+                <BookmarkIcon className="text-cyan-500 h-5 w-5" />
               )}
             </button>
             <button onClick={() => setIsProgramChanging(true)}>
-              <PencilSquareIcon className="text-cyan-500 h-4 w-4" />
+              <PencilIcon className="text-cyan-500 h-5 w-5" />
             </button>
           </div>
         ) : (
-          <div>
+          <div className="space-y-2">
             <form
-              onSubmit={() => handleProgramChange(customProgramID)}
+              onSubmit={() => {
+                handleProgramChange(customProgramID);
+              }}
               className="space-y-2"
             >
               <input
@@ -112,32 +114,33 @@ const SettingsPanel = () => {
                 placeholder="Market Address"
                 className="flex-1 px-4 py-2 w-full border-cyan-600 border-b bg-transparent focus:outline-none"
               />
-              {Object.entries(DEX_PROGRAMS).map(([programID, programLabel]) => (
-                <button
-                  type="submit"
-                  key={programID}
-                  className="w-full bg-slate-700 hover:bg-slate-600 transition-colors py-2 px-4 rounded flex items-center justify-between cursor-pointer"
-                  onClick={() => {
-                    setCustomProgramID(programID);
-                    handleProgramChange(programID);
-                  }}
-                >
-                  <p className="text-sm font-medium">{programLabel}</p>
-                  <p className="text-sm font-light">
-                    {programID.slice(0, 16)}...
-                  </p>
-                </button>
-              ))}
-              {pinnedPrograms.length > 0 ? (
-                <div>
-                  {/* <h3 className="text-sm  text-cyan-200 font-light mb-1">
-                    Pinned Programs
-                  </h3> */}
-                  {pinnedPrograms.map((programId) => (
+              <button type="submit" className="hidden" />
+            </form>
+
+            {Object.entries(DEX_PROGRAMS).map(([programID, programLabel]) => (
+              <button
+                type="submit"
+                key={programID}
+                className="w-full bg-slate-700 hover:bg-slate-600 transition-colors py-2 px-4 rounded flex items-center justify-between cursor-pointer"
+                onClick={() => {
+                  setCustomProgramID(programID);
+                  handleProgramChange(programID);
+                }}
+              >
+                <p className="text-sm font-medium">{programLabel}</p>
+                <p className="text-sm font-light">
+                  {programID.slice(0, 16)}...
+                </p>
+              </button>
+            ))}
+            {pinnedPrograms.length > 0 ? (
+              <div>
+                {pinnedPrograms.map((programId) => (
+                  <div
+                    key={programId}
+                    className="w-full bg-slate-700 hover:bg-slate-600 transition-colors py-2 px-4 rounded flex items-center justify-between text-left cursor-pointer"
+                  >
                     <button
-                      key={programId}
-                      type="submit"
-                      className="w-full bg-slate-700 hover:bg-slate-600 transition-colors py-2 px-4 rounded flex items-center justify-between text-left cursor-pointer"
                       onClick={() => {
                         setCustomProgramID(programId);
                         handleProgramChange(programId);
@@ -146,14 +149,14 @@ const SettingsPanel = () => {
                       <p className="text-sm font-medium">
                         {programId.slice(0, 12)}...
                       </p>
-                      <div onClick={() => unpinProgram(programId)}>
-                        <TrashIcon className="h-5 w-5 text-slate-300 cursor-pointer hover:text-cyan-400 transition-all" />
-                      </div>
                     </button>
-                  ))}
-                </div>
-              ) : null}
-            </form>
+                    <div onClick={() => unpinProgram(programId)}>
+                      <TrashIcon className="h-5 w-5 text-slate-300 cursor-pointer hover:text-cyan-400 transition-all" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : null}
           </div>
         )}
       </div>
