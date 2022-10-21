@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 import {
   CLUSTERS,
   CUSTOM_RPC_CLUSTER,
@@ -18,6 +18,7 @@ import { toast } from "react-toastify";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { prettifyPubkey } from "../../utils/pubkey";
+import debounce from "lodash.debounce";
 
 const SettingsPanel = () => {
   const wallet = useWallet();
@@ -39,7 +40,6 @@ const SettingsPanel = () => {
     }));
 
   const handleProgramChange = (programId: string) => {
-    console.log("Changing program to", programId);
     setProgramID(programId);
     setIsProgramChanging(false);
   };
@@ -52,33 +52,36 @@ const SettingsPanel = () => {
     } else pinProgram(programID.toString());
   };
 
+  const customEndpointChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
+    setEndpoint(e.target.value);
+  };
+
+  const debouncedEndpointChangeHandler = useMemo(
+    () => debounce(customEndpointChangeHandler, 1000),
+    []
+  );
+
   useEffect(() => {
-    let debounceTimer: NodeJS.Timeout;
-
     if (cluster.network === "custom") {
-      debounceTimer = setTimeout(() => {
-        try {
-          const endpointURL = new URL(endpoint);
+      try {
+        const endpointURL = new URL(endpoint);
+        if (endpointURL.toString() !== cluster.endpoint) {
           setCustomEndpoint(endpointURL.toString());
-          toast.success("RPC endpoint updated!");
-        } catch (e) {
-          console.error(e);
-          toast.error("Invalid RPC endpoint");
-          setCustomEndpoint(CUSTOM_RPC_CLUSTER.endpoint);
+          toast.success("RPC endpoint updated!", {
+            pauseOnHover: false,
+            autoClose: 1000,
+          });
         }
-      }, 1500);
+      } catch (e) {
+        console.error(e);
+        toast.error("Invalid RPC endpoint");
+      }
     }
-
-    return () => clearTimeout(debounceTimer);
-    // TODO: setCustomEndpoint is changing, and hence the useEffect keeps running, need to solve?
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [endpoint]);
+  }, [cluster, endpoint]);
 
   return (
     <div className="space-y-4">
-      {/* <div className="md:hidden">
-       
-      </div> */}
       <div className="space-y-1">
         <h3 className="text-slate-300 text-xs">Program ID</h3>
         {!isProgramChanging ? (
@@ -200,8 +203,8 @@ const SettingsPanel = () => {
                 {cluster.label === "Custom RPC" && (
                   <input
                     type="text"
-                    value={endpoint}
-                    onChange={(e) => setEndpoint(e.target.value)}
+                    defaultValue={CUSTOM_RPC_CLUSTER.endpoint}
+                    onChange={debouncedEndpointChangeHandler}
                     className="border border-cyan-600 p-2 text-cyan-500 text-sm rounded mt-1 w-full bg-slate-700 focus:outline-none"
                   />
                 )}

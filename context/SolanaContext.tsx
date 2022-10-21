@@ -44,7 +44,7 @@ const SolanaContext = createContext<SolanaContextType | null>(null);
 
 export const CLUSTER_LOCAL_STORAGE_KEY = "cluster-serum-explorer";
 
-export const LOCALNET_URL = "http://localhost:8899";
+export const LOCALNET_URL = "http://localhost:8899/";
 
 export const CLUSTERS: SolanaCluster[] = [
   {
@@ -83,7 +83,7 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const router = useRouter();
 
   const endpoint = useMemo(() => {
-    if (cluster.label === "Custom RPC") {
+    if (cluster.network === "custom") {
       return customEndpoint;
     }
     return cluster.endpoint;
@@ -145,6 +145,10 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
 
   useEffect(() => {
     if (router.query.customRPC) {
+      _setCluster({
+        ...CLUSTERS[3],
+        endpoint: router.query.customRPC as string,
+      });
       _setCustomEndpoint(router.query.customRPC as string);
     }
   }, [router.query.customRPC]);

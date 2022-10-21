@@ -44,7 +44,7 @@ export const SiteLayout: FC<SiteLayoutProps> = ({
   };
 
   const debouncedChangeHandler = useMemo(
-    () => debounce(queryChangeHandler, 1500),
+    () => debounce(queryChangeHandler, 500),
     []
   );
 
