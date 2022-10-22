@@ -1,5 +1,11 @@
 import { PublicKey } from "@solana/web3.js";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import {
+  ChangeEvent,
+  MutableRefObject,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   CLUSTERS,
   CUSTOM_RPC_CLUSTER,
@@ -19,8 +25,21 @@ import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { prettifyPubkey } from "../../utils/pubkey";
 import debounce from "lodash.debounce";
+import { useRouter } from "next/router";
 
-const SettingsPanel = () => {
+type SettingPanelProps = {
+  close: (
+    focusableElement?:
+      | HTMLElement
+      | MutableRefObject<HTMLElement | null>
+      | undefined
+  ) => void;
+};
+
+const SettingsPanel = ({ close }: SettingPanelProps) => {
+  const router = useRouter();
+  const { network } = router.query;
+
   const wallet = useWallet();
   const { programID, setProgramID } = useSerum();
   const { setCluster, isActiveCluster, setCustomEndpoint, cluster } =
@@ -81,8 +100,25 @@ const SettingsPanel = () => {
   }, [cluster, endpoint]);
 
   return (
-    <div className="space-y-4">
-      <div className="space-y-1">
+    <div>
+      <div className="border-b border-slate-700">
+        {network ? (
+          <button
+            onClick={() => {
+              router.push({
+                pathname: `/market/create`,
+                query: router.query,
+              });
+              close();
+            }}
+          >
+            <p className="mb-4 text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
+              Create Market
+            </p>
+          </button>
+        ) : null}
+      </div>
+      <div className="space-y-1 my-4">
         <h3 className="text-slate-300 text-xs">Program ID</h3>
         {!isProgramChanging ? (
           <div className="w-full flex items-center space-x-2 ">
@@ -91,14 +127,20 @@ const SettingsPanel = () => {
                 ? DEX_PROGRAMS[programID.toString()]
                 : `${programID.toString().slice(0, 18)}...`}
             </p>
-            <button onClick={() => handlePin(programID)}>
+            <button
+              onClick={() => handlePin(programID)}
+              className="focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none focus:outline-none"
+            >
               {isPinned(programID.toString()) ? (
-                <BookmarkIconSolid className="text-cyan-500 h-5 w-5" />
+                <BookmarkIconSolid className="text-cyan-500 h-5 w-5 " />
               ) : (
-                <BookmarkIcon className="text-cyan-500 h-5 w-5" />
+                <BookmarkIcon className="text-cyan-500 h-5 w-5 focus-visible:outline-none focus-visible:border-none" />
               )}
             </button>
-            <button onClick={() => setIsProgramChanging(true)}>
+            <button
+              onClick={() => setIsProgramChanging(true)}
+              className="focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none"
+            >
               <PencilIcon className="text-cyan-500 h-5 w-5" />
             </button>
           </div>
@@ -163,8 +205,8 @@ const SettingsPanel = () => {
           </div>
         )}
       </div>
-      <div>
-        <div className="space-y-1">
+      <div className="mb-4">
+        <div className="space-y-1.5">
           <h3 className="text-slate-300 text-xs">Connection</h3>
           <ul className="space-y-1.5">
             {CLUSTERS.map((cluster) => {
@@ -230,7 +272,7 @@ const SettingsPanel = () => {
           onClick={() =>
             wallet.connected ? wallet.disconnect() : setVisible(true)
           }
-          className="bg-slate-700 hover:bg-slate-600 transition-colors text-cyan-400 rounded-md w-full py-2 px-2"
+          className="bg-slate-700 hover:bg-slate-600 transition-colors text-cyan-400 rounded-md w-full py-2 px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none"
         >
           {wallet.connected ? "Disconnect Wallet" : "Connect"}
         </button>

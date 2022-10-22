@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { useRouter } from "next/router";
 import { ReactNode } from "react";
+import CreateMarket from "../components/createMarket";
 import { getLayout } from "../components/layouts/SiteLayout";
 import { useSerumMarkets } from "../hooks/useSerumMarkets";
 import { useSerumStats } from "../hooks/useSerumStats";
@@ -7,6 +9,9 @@ import { classNames } from "../utils/general";
 import { prettifyDecimal } from "../utils/numerical";
 
 const Home = () => {
+  const router = useRouter();
+  const { network } = router.query;
+
   const { serumMarkets, loading: serumMarketsLoading } = useSerumMarkets();
 
   const { stats, loading } = useSerumStats();
@@ -72,26 +77,6 @@ const Home = () => {
   return (
     <div className="flex flex-col space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
-        <StatBlock loading={loading}>
-          <div>
-            <p className="text-slate-300 text-sm">TVL</p>
-          </div>
-          <div>
-            <p className="text-2xl font-medium text-slate-200">
-              {prettifyDecimal(stats?.tvl, 2)}
-            </p>
-          </div>
-        </StatBlock>
-        <StatBlock loading={loading}>
-          <div>
-            <p className="text-slate-300 text-sm">Total Vol. 1d</p>
-          </div>
-          <div>
-            <p className="text-2xl font-medium text-slate-200">
-              {prettifyDecimal(stats?.totalVol1d, 2)}
-            </p>
-          </div>
-        </StatBlock>
         <StatBlock loading={serumMarketsLoading}>
           <div>
             <p className="text-slate-300 text-sm"># of markets</p>
@@ -104,7 +89,40 @@ const Home = () => {
             </div>
           ) : null}
         </StatBlock>
+        <StatBlock loading={loading}>
+          <div>
+            <p className="text-slate-300 text-sm">TVL</p>
+          </div>
+          {!network ? (
+            <div>
+              <p className="text-2xl font-medium text-slate-200">
+                {prettifyDecimal(stats?.tvl, 2)}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-slate-500">Unavailable</p>
+            </div>
+          )}
+        </StatBlock>
+        <StatBlock loading={loading}>
+          <div>
+            <p className="text-slate-300 text-sm">Total Vol. 1d</p>
+          </div>
+          {!network ? (
+            <div>
+              <p className="text-2xl font-medium text-slate-200">
+                {prettifyDecimal(stats?.totalVol1d, 2)}
+              </p>
+            </div>
+          ) : (
+            <div>
+              <p className="text-slate-500">Unavailable</p>
+            </div>
+          )}
+        </StatBlock>
       </div>
+      <CreateMarket />
     </div>
   );
 };
