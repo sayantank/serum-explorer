@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
-import { getLayout } from "../../components/layouts/SiteLayout";
+import { getHeaderLayout } from "../../components/layouts/HeaderLayout";
 
 const CreateMarket = () => {
-  return <h1>create marker</h1>;
+  return <h1>create market</h1>;
 };
 
-CreateMarket.getLayout = (page: ReactNode) => getLayout(page, "Create Market");
+CreateMarket.getLayout = (page: ReactNode) =>
+  getHeaderLayout(page, "Create Market");
 
 export default CreateMarket;

@@ -101,7 +101,7 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
 
   return (
     <div>
-      <div className="border-b border-slate-700">
+      <div className="md:hidden border-b border-slate-700 pb-3">
         {network ? (
           <button
             onClick={() => {
@@ -112,17 +112,19 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
               close();
             }}
           >
-            <p className="mb-4 text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
+            <p className="text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
               Create Market
             </p>
           </button>
         ) : null}
       </div>
-      <div className="space-y-1 my-4">
-        <h3 className="text-slate-300 text-xs">Program ID</h3>
+      <div className="space-y-1 my-4 md:mt-2">
+        <h3 className="text-xs text-transparent bg-clip-text serum-gradient">
+          Program ID
+        </h3>
         {!isProgramChanging ? (
           <div className="w-full flex items-center space-x-2 ">
-            <p className="text-cyan-400">
+            <p className="text-slate-200">
               {DEX_PROGRAMS[programID.toString()]
                 ? DEX_PROGRAMS[programID.toString()]
                 : `${programID.toString().slice(0, 18)}...`}
@@ -132,16 +134,16 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
               className="focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none focus:outline-none"
             >
               {isPinned(programID.toString()) ? (
-                <BookmarkIconSolid className="text-cyan-500 h-5 w-5 " />
+                <BookmarkIconSolid className="text-slate-300 h-5 w-5 " />
               ) : (
-                <BookmarkIcon className="text-cyan-500 h-5 w-5 focus-visible:outline-none focus-visible:border-none" />
+                <BookmarkIcon className="text-slate-300 h-5 w-5 focus-visible:outline-none focus-visible:border-none" />
               )}
             </button>
             <button
               onClick={() => setIsProgramChanging(true)}
               className="focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none"
             >
-              <PencilIcon className="text-cyan-500 h-5 w-5" />
+              <PencilIcon className="text-slate-200 h-5 w-5" />
             </button>
           </div>
         ) : (
@@ -186,12 +188,13 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
                     className="w-full bg-slate-700 hover:bg-slate-600 transition-colors py-2 px-4 rounded flex items-center justify-between text-left cursor-pointer"
                   >
                     <button
+                      className="flex-1 align-left"
                       onClick={() => {
                         setCustomProgramID(programId);
                         handleProgramChange(programId);
                       }}
                     >
-                      <p className="text-sm font-medium">
+                      <p className="text-sm font-medium text-left">
                         {programId.slice(0, 12)}...
                       </p>
                     </button>
@@ -207,7 +210,9 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
       </div>
       <div className="mb-4">
         <div className="space-y-1.5">
-          <h3 className="text-slate-300 text-xs">Connection</h3>
+          <h3 className="text-transparent bg-clip-text serum-gradient text-xs">
+            Connection
+          </h3>
           <ul className="space-y-1.5">
             {CLUSTERS.map((cluster) => {
               if (cluster.label !== "Custom RPC")
@@ -220,10 +225,10 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
                     } hover:bg-slate-600 p-2 cursor-pointer rounded-md `}
                   >
                     <div>
-                      <h2 className="text-sm font-medium text-cyan-400">
+                      <h2 className="text-sm font-medium text-slate-200">
                         {cluster.label}
                       </h2>
-                      <p className="text-xs font-light text-cyan-500">
+                      <p className="text-xs font-light text-slate-400">
                         {cluster.endpoint}
                       </p>
                     </div>
@@ -239,7 +244,7 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
               onClick={() => setCluster(CUSTOM_RPC_CLUSTER)}
             >
               <div>
-                <h2 className="font-medium text-sm text-cyan-400">
+                <h2 className="font-medium text-sm text-slate-200">
                   Custom RPC
                 </h2>
                 {cluster.label === "Custom RPC" && (
@@ -247,7 +252,7 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
                     type="text"
                     defaultValue={CUSTOM_RPC_CLUSTER.endpoint}
                     onChange={debouncedEndpointChangeHandler}
-                    className="border border-cyan-600 p-2 text-cyan-500 text-sm rounded mt-1 w-full bg-slate-700 focus:outline-none"
+                    className="border border-slate-500 p-2 text-slate-300 text-sm rounded mt-1 w-full bg-slate-700 focus:outline-none"
                   />
                 )}
               </div>
@@ -258,21 +263,20 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
       <div className="md:hidden">
         {wallet.connected ? (
           <div>
-            <p className="text-xs text-slate-300">
-              Connected to{" "}
-              <span className="font-medium">
-                {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
-                {prettifyPubkey(wallet.publicKey!, 6)}
-              </span>
+            <p className="text-xs text-transparent bg-clip-text serum-gradient">
+              Wallet address{" "}
             </p>
-            <p className="text-sm mb-1"></p>
+            <p className="text-slate-200 mb-2 text-sm">
+              {/* eslint-disable-next-line @typescript-eslint/no-non-null-assertion */}
+              {prettifyPubkey(wallet.publicKey!, 12)}
+            </p>
           </div>
         ) : null}
         <button
           onClick={() =>
             wallet.connected ? wallet.disconnect() : setVisible(true)
           }
-          className="bg-slate-700 hover:bg-slate-600 transition-colors text-cyan-400 rounded-md w-full py-2 px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none"
+          className="bg-slate-700 hover:bg-slate-600 transition-colors text-slate-200 rounded-md w-full py-2 px-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none"
         >
           {wallet.connected ? "Disconnect Wallet" : "Connect"}
         </button>

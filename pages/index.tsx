@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import CreateMarket from "../components/createMarket";
-import { getLayout } from "../components/layouts/SiteLayout";
+import { getSearchLayout } from "../components/layouts/SearchLayout";
 import { useSerumMarkets } from "../hooks/useSerumMarkets";
 import { useSerumStats } from "../hooks/useSerumStats";
 import { classNames } from "../utils/general";
@@ -56,7 +55,7 @@ const Home = () => {
     loading: boolean;
     height?: number;
   }) => {
-    return !loading ? (
+    return !loading || network ? (
       <div
         className={classNames(
           "bg-slate-800 py-2 px-3 rounded-md space-y-1 border border-slate-700"
@@ -79,7 +78,9 @@ const Home = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-stretch">
         <StatBlock loading={serumMarketsLoading}>
           <div>
-            <p className="text-slate-300 text-sm"># of markets</p>
+            <p className="text-transparent bg-clip-text serum-gradient text-sm">
+              # of markets
+            </p>
           </div>
           {serumMarkets ? (
             <div>
@@ -91,7 +92,9 @@ const Home = () => {
         </StatBlock>
         <StatBlock loading={loading}>
           <div>
-            <p className="text-slate-300 text-sm">TVL</p>
+            <p className="text-transparent bg-clip-text serum-gradient text-sm">
+              TVL
+            </p>
           </div>
           {!network ? (
             <div>
@@ -107,7 +110,9 @@ const Home = () => {
         </StatBlock>
         <StatBlock loading={loading}>
           <div>
-            <p className="text-slate-300 text-sm">Total Vol. 1d</p>
+            <p className="text-transparent bg-clip-text serum-gradient text-sm">
+              Total Vol. 1d
+            </p>
           </div>
           {!network ? (
             <div>
@@ -122,11 +127,10 @@ const Home = () => {
           )}
         </StatBlock>
       </div>
-      <CreateMarket />
     </div>
   );
 };
 
-Home.getLayout = (page: ReactNode) => getLayout(page, "Home");
+Home.getLayout = (page: ReactNode) => getSearchLayout(page, "Home");
 
 export default Home;

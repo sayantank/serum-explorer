@@ -45,7 +45,9 @@ const Header: FC = () => {
                 alt="Serum Explorer"
               />
             </div>
-            <p className="text-slate-200">Explorer</p>
+            <p className="text-transparent bg-clip-text serum-gradient">
+              Explorer
+            </p>
           </button>
           <div className="space-x-4 hidden md:block">
             {network ? (
@@ -66,7 +68,7 @@ const Header: FC = () => {
           </div>
         </div>
         <div className="md:hidden">
-          <Popover.Button className="inline-flex items-center justify-center rounded-md p-1 md:p-2 text-cyan-400 hover:bg-slate-800 hover:text-cyan-400 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-500">
+          <Popover.Button className="inline-flex items-center justify-center rounded-md p-1 md:p-2 text-slate-200 hover:bg-slate-800 hover:text-slate-300 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-500">
             <span className="sr-only">Open menu</span>
             <Bars3Icon className="h-6 w-6" aria-hidden="true" />
           </Popover.Button>
@@ -77,8 +79,10 @@ const Header: FC = () => {
               <>
                 <div className="flex items-center space-x-4">
                   <div className="flex flex-col items-end">
-                    <p className="text-xs text-slate-500">Program Id</p>
-                    <p className="text-sm text-slate-300">
+                    <p className="text-xs text-transparent bg-clip-text serum-gradient">
+                      Program ID
+                    </p>
+                    <p className="text-sm text-slate-200">
                       {DEX_PROGRAMS[programID.toString()]
                         ? DEX_PROGRAMS[programID.toString()]
                         : `${prettifyPubkey(programID)}`}
@@ -87,12 +91,12 @@ const Header: FC = () => {
                   <Popover.Button
                     className={`
                 ${open ? "" : "text-opacity-90"}
-                group inline-flex items-center rounded-md bg-slate-700 hover:bg-slate-600 px-3 py-2 text-sm text-cyan-400 hover:text-cyan-500 hover:text-opacity-100 focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-opacity-75 transition-colors`}
+                group inline-flex items-center rounded-md bg-slate-700 hover:bg-slate-600 px-3 py-2 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-opacity-75 transition-colors`}
                   >
                     {/* <span>Settings</span> */}
                     <Cog6ToothIcon
                       className={`${open ? "" : "text-opacity-70"}
-                  h-5 w-5 text-cyan-400 group-hover:text-cyan-500 transition duration-150 ease-in-out group-hover:text-opacity-80`}
+                  h-5 w-5 text-slate-200 group-hover:text-slate-300 transition duration-150 ease-in-out group-hover:text-opacity-80`}
                       aria-hidden="true"
                     />
                   </Popover.Button>
