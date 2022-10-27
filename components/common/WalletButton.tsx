@@ -3,15 +3,34 @@ import { useWallet } from "@solana/wallet-adapter-react";
 import { useWalletModal } from "@solana/wallet-adapter-react-ui";
 import { FC, useRef, useState } from "react";
 import { useOutsideAlerter } from "../../hooks/useOutsideAlerter";
+import { copyTextToClipboard } from "../../utils/general";
 
 const WalletButton: FC = () => {
   const wallet = useWallet();
   const { visible, setVisible } = useWalletModal();
 
   const [showDropdown, setShowDropdown] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   useOutsideAlerter(dropdownRef, showDropdown, () => setShowDropdown(false));
+
+  const handleCopyClick = () => {
+    if (!wallet.publicKey) return;
+
+    // Asynchronously call copyTextToClipboard
+    copyTextToClipboard(wallet.publicKey.toBase58())
+      .then(() => {
+        // If successful, update the isCopied state value
+        setIsCopied(true);
+        setTimeout(() => {
+          setIsCopied(false);
+        }, 1500);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
 
   return (
     <div className="relative flex justify-end" ref={dropdownRef}>
@@ -37,8 +56,18 @@ const WalletButton: FC = () => {
       <ul
         className={`${
           showDropdown ? "block" : "hidden"
-        } absolute top-full w-64 my-2  bg-slate-800 py-1 border border-cyan-600 rounded flex flex-col space-y-1`}
+        } absolute top-full w-64 my-2  bg-slate-800 py-1 border border-slate-700 rounded flex flex-col space-y-1`}
       >
+        <li
+          className="hover:bg-slate-700 p-2 cursor-pointer"
+          onClick={handleCopyClick}
+        >
+          <div>
+            <p className="text-sm text-slate-300">
+              {isCopied ? "Copied!" : "Copy Address"}
+            </p>
+          </div>
+        </li>
         <li
           className={`hover:bg-slate-700 p-2 cursor-pointer`}
           onClick={() => {
@@ -47,7 +76,7 @@ const WalletButton: FC = () => {
           }}
         >
           <div>
-            <h2 className="text-sm">Disconnect</h2>
+            <h2 className="text-sm text-slate-300">Disconnect</h2>
           </div>
         </li>
       </ul>

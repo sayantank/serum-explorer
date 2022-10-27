@@ -14,8 +14,6 @@ const fetcher = async ({
   programID: PublicKey;
   connection: Connection;
 }): Promise<Market> => {
-  console.log("[SERUM_EXPLORER] Fetching market...");
-
   if (!marketAddress) {
     throw new Error("No market address provided");
   }
@@ -52,7 +50,7 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
       revalidateOnFocus: false,
       errorRetryCount: 1,
       onError: (err) => {
-        console.error(err);
+        console.error("[explorer]: failed to fetch market", err);
         toast.error("Failed to load market.");
       },
     }

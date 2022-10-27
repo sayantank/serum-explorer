@@ -27,7 +27,6 @@ const fetcher = async ({
   connection: Connection;
   cluster: ClusterType;
 }): Promise<SerumMarketInfo[]> => {
-  console.log(`[SERUM_EXPLORER] Fetching markets...`);
   let serumMarkets: SerumMarketInfo[];
 
   if (cluster === "mainnet-beta" && programID.toBase58() === SERUM_DEX_V3) {
@@ -97,7 +96,8 @@ export const useSerumMarkets = () => {
     () => fetcher({ programID, connection, cluster: cluster.network }),
     {
       // FIX: revalidateOnMount should be false, but it wouldn't fetch on initial mount also for some reason.
-      revalidateOnFocus: false, // NOTE: Since mainnet-beta data is from VYBE API, we don't have to revalidate at all.
+      revalidateOnMount: true,
+      revalidateOnFocus: cluster.network !== "mainnet-beta", // NOTE: Since mainnet-beta data is from VYBE API, we don't have to revalidate at all.
       revalidateIfStale: false,
       errorRetryCount: 1,
       onError: (err) => {

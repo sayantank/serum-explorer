@@ -23,3 +23,15 @@ export function getExplorerAccountLink(
 export const isLocalhost = (url: string) => {
   return url.includes("localhost") || url.includes("127.0.0.1");
 };
+
+export async function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export async function copyTextToClipboard(text: string) {
+  if ("clipboard" in navigator) {
+    return await navigator.clipboard.writeText(text);
+  } else {
+    return document.execCommand("copy", true, text);
+  }
+}

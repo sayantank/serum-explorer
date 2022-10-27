@@ -44,8 +44,6 @@ const eventQueueFetcher = ({
   serumMarket?: Market;
   connection: Connection;
 }) => {
-  console.log("[SERUM_EXPLORER] Fetching event queue...");
-
   if (!serumMarket) throw new Error("Serum market not found");
   return serumMarket.loadEventQueue(connection);
 };
@@ -59,8 +57,6 @@ const openOrdersFetcher = ({
   walletAddress?: PublicKey | null;
   connection: Connection;
 }) => {
-  console.log("[SERUM_EXPLORER] Fetching open orders...");
-
   if (!serumMarket || !walletAddress)
     throw new Error("Serum market or wallet address not found");
   return serumMarket.findOpenOrdersAccountsForOwner(connection, walletAddress);
@@ -75,8 +71,6 @@ const ordersFetcher = async ({
   walletAddress?: PublicKey | null;
   connection: Connection;
 }) => {
-  console.log("[SERUM_EXPLORER] Fetching orders...");
-
   if (!serumMarket || !walletAddress)
     throw new Error("Serum market or wallet address not found");
 

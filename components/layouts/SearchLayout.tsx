@@ -49,7 +49,10 @@ export const SearchLayout: FC<SearchLayoutProps> = ({
   const handleSelect = (value: SerumMarketInfo | undefined) => {
     if (value) {
       setSelected(value);
-      router.push(`/market/${value.address.toString()}`);
+      router.push({
+        pathname: `/market/${value.address.toString()}`,
+        query: router.query,
+      });
     }
   };
 

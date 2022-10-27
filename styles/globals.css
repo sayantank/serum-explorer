@@ -23,3 +23,7 @@ body {
 .serum-gradient {
     @apply bg-gradient-to-t from-cyan-600 to-cyan-300
 }
+
+.focus-style {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none
+}
