@@ -26,7 +26,7 @@ export const VaultCard = ({
       <div className="flex flex-col">
         <h3 className=" text-sm text-slate-300">Balance</h3>
         <div className="flex space-x-2 items-end text-slate-200">
-          <p className="text-4xl font-bold">
+          <p className="text-4xl font-medium">
             {tokenAtomicsToPrettyDecimal(
               depositAtomics,
               mint.decimals
