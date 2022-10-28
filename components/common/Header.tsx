@@ -49,7 +49,20 @@ const Header: FC = () => {
               Explorer
             </p>
           </button>
-          <div className="space-x-4 hidden md:block">
+          <div className="space-x-4 hidden md:flex items-center">
+            <Link
+              passHref
+              href={{
+                pathname: `/decoder`,
+                query: router.query,
+              }}
+            >
+              <a className="focus-style px-1 rounded">
+                <p className="text-sm text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
+                  Decoder
+                </p>
+              </a>
+            </Link>
             {network ? (
               <Link
                 passHref
@@ -58,7 +71,7 @@ const Header: FC = () => {
                   query: router.query,
                 }}
               >
-                <a>
+                <a className="focus-style px-1 rounded">
                   <p className="text-sm text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
                     Create Market
                   </p>
@@ -91,7 +104,7 @@ const Header: FC = () => {
                   <Popover.Button
                     className={`
                 ${open ? "" : "text-opacity-90"}
-                group inline-flex items-center rounded-md bg-slate-700 hover:bg-slate-600 px-3 py-2 text-sm focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-opacity-75 transition-colors`}
+                group inline-flex items-center rounded-md bg-slate-700 hover:bg-slate-600 px-3 py-2 text-sm focus-style transition-colors`}
                   >
                     {/* <span>Settings</span> */}
                     <Cog6ToothIcon

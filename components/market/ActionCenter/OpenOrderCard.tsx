@@ -190,7 +190,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
           <h3 className="input-label">
             Free {baseMetadata ? baseMetadata.data.data.symbol : "Base Tokens"}
           </h3>
-          <p className="text-lg font-bold">
+          <p className="text-lg font-medium">
             {tokenAtomicsToPrettyDecimal(
               openOrder.baseTokenFree,
               baseMint.decimals
@@ -202,7 +202,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
             Free{" "}
             {quoteMetadata ? quoteMetadata.data.data.symbol : "Quote Tokens"}
           </h3>
-          <p className="text-lg font-bold">
+          <p className="text-lg font-medium">
             {tokenAtomicsToPrettyDecimal(
               openOrder.quoteTokenFree,
               quoteMint.decimals

@@ -42,7 +42,7 @@ const WalletButton: FC = () => {
               }
             : () => setVisible(!visible)
         }
-        className="bg-slate-700 hover:bg-slate-600 rounded-md focus:outline-none focus-visible:ring-1 focus-visible:ring-cyan-500 focus-visible:ring-opacity-75 transition-colors"
+        className="bg-slate-700 hover:bg-slate-600 rounded-md focus-style transition-colors"
       >
         <div className="md:block hidden py-2 px-4 text-sm text-slate-200 group-hover:text-slate-300">
           {wallet.connected && wallet.publicKey

@@ -101,7 +101,21 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
 
   return (
     <div>
-      <div className="md:hidden border-b border-slate-700 pb-3">
+      <div className="md:hidden border-b border-slate-700 pb-3 space-y-2 flex-col flex">
+        <button
+          onClick={() => {
+            router.push({
+              pathname: `/decoder`,
+              query: router.query,
+            });
+            close();
+          }}
+          className="w-fit focus-style px-1 py-0.5 rounded"
+        >
+          <p className="text-left text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
+            Decoder
+          </p>
+        </button>
         {network ? (
           <button
             onClick={() => {
@@ -111,8 +125,9 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
               });
               close();
             }}
+            className="w-fit focus-style px-1 py-0.5 rounded"
           >
-            <p className="text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
+            <p className="text-left text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
               Create Market
             </p>
           </button>

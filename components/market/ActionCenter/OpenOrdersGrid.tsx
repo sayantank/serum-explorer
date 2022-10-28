@@ -17,7 +17,7 @@ const OpenOrdersGrid = () => {
             ))}
         </div>
       ) : (
-        <div className="w-full flex items-center justify-center bg-cyan-900 p-2 rounded-md text-sm text-cyan-600">
+        <div className="w-full flex items-center justify-center p-2 rounded-md text-sm text-slate-500">
           No OpenOrder accounts found
         </div>
       )}

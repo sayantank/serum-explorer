@@ -73,11 +73,13 @@ export const SearchLayout: FC<SearchLayoutProps> = ({
         <Combobox value={selected} onChange={(value) => handleSelect(value)}>
           <div className="relative mt-1">
             <div className="relative w-full cursor-default overflow-hidden rounded-md  bg-slate-800 text-left border border-slate-700 focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0">
-              <Combobox.Input
-                placeholder="Search markets"
-                className="w-full border-none py-3 pl-3 pr-10 text-sm leading-5 text-slate-200 bg-slate-800 focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-slate-400"
-                onChange={debouncedChangeHandler}
-              />
+              <Combobox.Button as="div">
+                <Combobox.Input
+                  placeholder="Search markets"
+                  className="w-full border-none py-3 pl-3 pr-10 text-sm leading-5 text-slate-200 bg-slate-800 focus-visible:border-0 focus-visible:outline-none focus-visible:ring-0 placeholder:text-slate-400"
+                  onChange={debouncedChangeHandler}
+                />
+              </Combobox.Button>
               <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
                 <ChevronUpDownIcon
                   className="h-5 w-5 text-cyan-400"
