@@ -67,7 +67,7 @@ export const UserDetails = () => {
         <h3 className="text-lg text-slate-200">User Details</h3>
         <div className="flex flex-col space-y-2 lg:space-y-0 lg:flex-row lg:space-x-6">
           <div>
-            <h3 className="text-sm text-slate-200 font-light">Address</h3>
+            <h3 className="input-label">Address</h3>
 
             <div className="flex items-center space-x-1">
               <p className="">{wallet.publicKey.toString().slice(0, 10)}...</p>
@@ -77,15 +77,13 @@ export const UserDetails = () => {
                 rel="noopener noreferrer"
                 className="focus-style rounded p-0.5"
               >
-                <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer focus-style" />
+                <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer focus-style text-cyan-400" />
               </a>
             </div>
           </div>
           <div className="flex space-x-6">
             <div>
-              <h3 className="text-sm text-slate-200 font-light">
-                Base Balance
-              </h3>
+              <h3 className="input-label">Base Balance</h3>
               <div className="flex items-center justify-between space-x-4">
                 <p className="text-lg font-medium">
                   {baseMint && baseBalance
@@ -107,9 +105,7 @@ export const UserDetails = () => {
               </div>
             </div>
             <div>
-              <h3 className="text-sm text-slate-200 font-light">
-                Quote Balance
-              </h3>
+              <h3 className="input-label">Quote Balance</h3>
               <div className="flex items-center justify-between space-x-4">
                 <p className="text-lg font-medium">
                   {quoteMint && quoteBalance

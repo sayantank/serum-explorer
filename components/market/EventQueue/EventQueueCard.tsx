@@ -34,7 +34,7 @@ export const EventQueueCard = () => {
           <button
             type="button"
             className={classNames(
-              "rounded-full flex items-center justify-center py-3 px-4 flex-1 focus:outline-none border-slate-600 border-2 text-slate-200",
+              "rounded-full flex items-center justify-center py-3 px-4 flex-1 focus:outline-none border-slate-600 border-2 text-slate-200 focus-style",
               selected ? "bg-slate-700 font-medium" : "bg-transparent"
             )}
           >
@@ -73,7 +73,9 @@ export const EventQueueCard = () => {
               </>
             ) : (
               <div className="px-4 flex justify-between items-center w-full ">
-                <p className="text-sm font-light">No events to show.</p>
+                <p className="text-sm font-light text-slate-400">
+                  No events to crank.
+                </p>
                 <ArrowPathIcon
                   className={`h-5 w-5 cursor-pointer text-cyan-400 ${
                     eventQueue.isValidating ? "animate-spin" : null

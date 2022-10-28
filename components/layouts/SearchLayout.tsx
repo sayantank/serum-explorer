@@ -92,7 +92,7 @@ export const SearchLayout: FC<SearchLayoutProps> = ({
               leaveTo="opacity-0"
               afterLeave={() => setMarketQuery("")}
             >
-              <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-slate-800 py-1 text-base shadow-lgsm:text-sm">
+              <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-slate-800 shadow-2xl border border-slate-700 py-1 text-base shadow-lgsm:text-sm">
                 {filteredMarkets.length === 0 && marketQuery !== "" ? (
                   <div className="relative cursor-default select-none py-2 px-4 text-gray-700">
                     Nothing found.

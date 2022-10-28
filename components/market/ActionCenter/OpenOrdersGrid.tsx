@@ -7,8 +7,8 @@ const OpenOrdersGrid = () => {
   if (!openOrders.data) return null;
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-lg">Open Order Accounts</h3>
+    <div className="space-y-3 p-3 rounded-md bg-slate-700">
+      <h3 className="text-lg text-slate-200">Open Order Accounts</h3>
       {openOrders.data?.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
           {openOrders.data &&

@@ -124,7 +124,7 @@ const Header: FC = () => {
           className="absolute w-full top-full origin-top transform transition md:hidden mt-2"
         >
           {({ close }) => (
-            <div className="rounded-lg bg-slate-800 border border-slate-700 px-2 py-4 shadow-lg mx-2">
+            <div className="rounded-lg bg-slate-800 border border-slate-700 px-2 py-4 shadow-2xl mx-2">
               <SettingsPanel close={close} />
             </div>
           )}

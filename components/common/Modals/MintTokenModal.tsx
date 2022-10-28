@@ -36,7 +36,7 @@ export default function MintTokenModal({
   const { connection } = useConnection();
   const wallet = useWallet();
 
-  const { register, handleSubmit } = useForm<MintTokenFormValues>();
+  const { register, handleSubmit, reset } = useForm<MintTokenFormValues>();
 
   const isWalletAuthority = useMemo(() => {
     if (!mint?.mintAuthority || !wallet.publicKey) return false;
@@ -103,6 +103,7 @@ export default function MintTokenModal({
           />
         ));
         await onClose();
+        reset();
       },
     });
 
