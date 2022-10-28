@@ -166,7 +166,9 @@ export const PlaceOrder = () => {
       <div
         className={classNames(
           "py-2 px-4 cursor-pointer",
-          checked ? "bg-cyan-700" : "bg-cyan-800 text-cyan-600"
+          checked
+            ? "bg-slate-600 text-slate-200"
+            : "bg-slate-500 text-slate-700"
         )}
       >
         {children}
@@ -191,8 +193,8 @@ export const PlaceOrder = () => {
   };
 
   return (
-    <div className="p-3 bg-cyan-900 rounded-md">
-      <h3 className="text-lg font-semibold">Place Order</h3>
+    <div className="p-3 bg-slate-700 rounded-md">
+      <h3 className="text-lg text-slate-200">Place Order</h3>
       <form onSubmit={handleSubmit(handlePlaceOrder)} className="space-y-3">
         <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-4">
           <RadioGroup
@@ -200,7 +202,7 @@ export const PlaceOrder = () => {
             onChange={setSide}
             className="space-y-1"
           >
-            <RadioGroup.Label className="text-sm text-cyan-200 font-light">
+            <RadioGroup.Label className="text-sm text-slate-300 font-light">
               Side
             </RadioGroup.Label>
             <div className="flex rounded-md overflow-hidden w-min">
@@ -217,14 +219,14 @@ export const PlaceOrder = () => {
             </div>
           </RadioGroup>
           <div className="space-y-1">
-            <label className="text-sm text-cyan-200 font-light">
+            <label className="text-sm text-slate-300 font-light">
               Order Type
             </label>
             <Listbox value={watchOrderType} onChange={setOrderType}>
               <div className="relative">
-                <Listbox.Button className="relative px-4 py-2 rounded-md bg-cyan-700 sm:w-64 min-w-full flex items-center justify-between">
+                <Listbox.Button className="relative px-4 py-2 rounded-md bg-slate-600 text-slate-200 sm:w-64 min-w-full flex items-center justify-between">
                   {watchOrderType.label}
-                  <ChevronDownIcon className="h-5 w-5 text-cyan-300" />
+                  <ChevronDownIcon className="h-5 w-5 text-slate-200" />
                 </Listbox.Button>
                 <Transition
                   as={Fragment}
@@ -232,13 +234,15 @@ export const PlaceOrder = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-lg sm:text-sm bg-cyan-700 w-full z-50">
+                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-lg sm:text-sm bg-slate-600 w-full z-50">
                     {orderTypes.map((orderType) => (
                       <Listbox.Option
                         key={orderType.value}
                         className={({ active }) =>
                           `relative cursor-pointer select-none py-2 px-4 ${
-                            active ? "bg-cyan-600 text-cyan-200" : "text-white"
+                            active
+                              ? "bg-slate-500 text-slate-100"
+                              : "text-slate-400"
                           }`
                         }
                         value={orderType}
@@ -257,7 +261,7 @@ export const PlaceOrder = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm text-cyan-200 font-light">
+            <label className="text-sm text-slate-300 font-light">
               Self-Trade Behaviour
             </label>
             <Listbox
@@ -265,9 +269,9 @@ export const PlaceOrder = () => {
               onChange={setSelfTradeBehaviour}
             >
               <div className="relative">
-                <Listbox.Button className="relative px-4 py-2 rounded-md bg-cyan-700 sm:w-48 min-w-full flex items-center justify-between">
+                <Listbox.Button className="relative px-4 py-2 rounded-md bg-slate-600 text-slate-200 sm:w-48 min-w-full flex items-center justify-between">
                   {watchSelfTradeBehaviour.label}
-                  <ChevronDownIcon className="h-5 w-5 text-cyan-300" />
+                  <ChevronDownIcon className="h-5 w-5 text-slate-200" />
                 </Listbox.Button>
                 <Transition
                   as={Fragment}
@@ -275,13 +279,15 @@ export const PlaceOrder = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-lg sm:text-sm bg-cyan-700 w-full">
+                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-lg sm:text-sm bg-slate-600 w-full z-10">
                     {selfTradeBehaviours.map((behaviour) => (
                       <Listbox.Option
                         key={behaviour.value}
                         className={({ active }) =>
                           `relative cursor-pointer select-none py-2 px-4 ${
-                            active ? "bg-cyan-600 text-cyan-200" : "text-white"
+                            active
+                              ? "bg-slate-500 text-slate-100"
+                              : "text-slate-400"
                           }`
                         }
                         value={behaviour}
@@ -302,26 +308,26 @@ export const PlaceOrder = () => {
         <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-4">
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm text-cyan-200 font-light">Size</span>
+              <span className="text-sm text-slate-300 font-light">Size</span>
             </label>
             <input
               {...register("size", {
                 required: true,
                 pattern: /^[1-9]\d*(\.\d+)?$/,
               })}
-              className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-600 focus:outline-none"
+              className="px-4 py-2 w-full rounded bg-transparent border-2 border-slate-500 focus:outline-none"
             />
           </div>
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm text-cyan-200 font-light">Price</span>
+              <span className="text-sm text-slate-300 font-light">Price</span>
             </label>
             <input
               {...register("price", {
                 required: true,
                 pattern: /^[1-9]\d*(\.\d+)?$/,
               })}
-              className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-600 focus:outline-none"
+              className="px-4 py-2 w-full rounded bg-transparent border-2 border-slate-500 focus:outline-none"
             />
           </div>
         </div>

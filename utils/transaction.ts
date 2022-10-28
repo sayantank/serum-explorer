@@ -103,16 +103,16 @@ export async function sendTransaction({
   connection,
   successCallback,
   sendingCallback,
-  sentCallback,
+  // sentCallback,
   timeout = DEFAULT_TIMEOUT,
 }: {
   transaction: Transaction;
   wallet: WalletContextState;
   signers?: Array<Keypair>;
   connection: Connection;
-  successCallback?: (txSig: string) => void;
-  sendingCallback?: () => void;
-  sentCallback?: (txSig: string) => void;
+  successCallback?: (txSig: string) => Promise<void>;
+  sendingCallback?: () => Promise<void>;
+  // sentCallback?: (txSig: string) => Promise<void>;
   timeout?: number;
 }) {
   const signedTransaction = await signTransaction({
@@ -126,7 +126,7 @@ export async function sendTransaction({
     connection,
     successCallback,
     sendingCallback,
-    sentCallback,
+    // sentCallback,
     timeout,
   });
 }
@@ -203,13 +203,15 @@ export async function sendSignedTransaction({
   successCallback,
   sendingCallback,
   timeout = DEFAULT_TIMEOUT,
+  skipPreflight = true,
 }: {
   signedTransaction: Transaction;
   connection: Connection;
-  successCallback?: (txSig: string) => void;
-  sendingCallback?: () => void;
-  sentCallback?: (txSig: string) => void;
+  successCallback?: (txSig: string) => Promise<void>;
+  sendingCallback?: () => Promise<void>;
+  // sentCallback?: (txSig: string) => void;
   timeout?: number;
+  skipPreflight?: boolean;
 }): Promise<string> {
   const rawTransaction = signedTransaction.serialize();
   const startTime = getUnixTs();
@@ -219,7 +221,7 @@ export async function sendSignedTransaction({
   const txid: TransactionSignature = await connection.sendRawTransaction(
     rawTransaction,
     {
-      skipPreflight: true,
+      skipPreflight,
     }
   );
 
@@ -231,7 +233,7 @@ export async function sendSignedTransaction({
       connection.sendRawTransaction(rawTransaction, {
         skipPreflight: true,
       });
-      await sleep(500);
+      await sleep(300);
     }
   })();
   try {

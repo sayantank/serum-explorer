@@ -9,11 +9,11 @@ body {
 }
 
 .card-header {
-    @apply text-xl font-bold w-full;
+    @apply text-xl font-medium w-full;
 }
 
 .primary-btn {
-    @apply w-full p-2 bg-cyan-600 hover:bg-cyan-700 transition-all font-semibold rounded-md flex items-center justify-center space-x-2 disabled:opacity-50 disabled:hover:bg-cyan-600
+    @apply w-full p-2 bg-slate-600 hover:bg-slate-500 transition-all font-medium rounded-md flex items-center justify-center space-x-2 disabled:opacity-50 disabled:hover:bg-slate-600
 }
 
 .critical-btn {
@@ -26,4 +26,8 @@ body {
 
 .focus-style {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none
+}
+
+.input {
+    @apply rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm
 }

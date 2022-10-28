@@ -12,9 +12,9 @@ export const OverviewTable = () => {
   }
 
   return (
-    <div className="bg-cyan-800 rounded w-full">
-      <div className="w-full p-4 md:px-8 border-b-2 border-b-cyan-600">
-        <h3 className="font-medium text-lg">Overview</h3>
+    <div className="bg-slate-800 rounded w-full border border-slate-700">
+      <div className="w-full p-4 md:px-8 border-b-2 border-b-slate-700">
+        <h3 className="font-medium text-lg text-slate-200">Overview</h3>
       </div>
       <DataTable>
         <DataTableRow

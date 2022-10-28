@@ -18,6 +18,7 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import BN from "bn.js";
+import { useRouter } from "next/router";
 import { ReactNode, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
@@ -75,6 +76,8 @@ export type CreateMarketFormValues = {
 };
 
 const CreateMarket = () => {
+  const router = useRouter();
+
   const { connection } = useConnection();
   const wallet = useWallet();
 
@@ -99,6 +102,7 @@ const CreateMarket = () => {
     }
   }, [createMint, setValue, clearErrors]);
 
+  // TODO: refactor somewhere else
   const handleCreateMarket: SubmitHandler<CreateMarketFormValues> = async (
     data
   ) => {
@@ -371,7 +375,8 @@ const CreateMarket = () => {
       await sendSignedTransaction({
         signedTransaction: signedTransactions[0],
         connection,
-        successCallback: (txSig) => {
+        skipPreflight: false,
+        successCallback: async (txSig) => {
           toast(
             () => (
               <TransactionToast
@@ -382,16 +387,17 @@ const CreateMarket = () => {
             { autoClose: 5000 }
           );
         },
-        sendingCallback: () => {
+        sendingCallback: async () => {
           toast.info(TRANSACTION_MESSAGES[0].sendingMessage, {
-            autoClose: 5000,
+            autoClose: 2000,
           });
         },
       });
       await sendSignedTransaction({
         signedTransaction: signedTransactions[1],
         connection,
-        successCallback: (txSig) => {
+        skipPreflight: false,
+        successCallback: async (txSig) => {
           toast(
             () => (
               <TransactionToast
@@ -402,16 +408,16 @@ const CreateMarket = () => {
             { autoClose: 5000 }
           );
         },
-        sendingCallback: () => {
+        sendingCallback: async () => {
           toast.info(TRANSACTION_MESSAGES[1].sendingMessage, {
-            autoClose: 5000,
+            autoClose: 2000,
           });
         },
       });
       await sendSignedTransaction({
         signedTransaction: signedTransactions[2],
         connection,
-        successCallback: (txSig) => {
+        successCallback: async (txSig) => {
           toast(
             () => (
               <TransactionToast
@@ -422,14 +428,19 @@ const CreateMarket = () => {
             { autoClose: 5000 }
           );
         },
-        sendingCallback: () => {
+        sendingCallback: async () => {
           toast.info(TRANSACTION_MESSAGES[2].sendingMessage, {
-            autoClose: 5000,
+            autoClose: 2000,
           });
         },
       });
+
+      router.push({
+        pathname: `${marketAccounts.market.publicKey.toBase58()}`,
+        query: router.query,
+      });
     } catch (e) {
-      console.error(e);
+      console.error("[explorer]: ", e);
       toast.error("Failed to create market.");
     }
   };
@@ -487,7 +498,11 @@ const CreateMarket = () => {
                 </div>
                 <div>
                   {createMint ? (
-                    <NewMintForm register={register} formState={formState} />
+                    <NewMintForm
+                      register={register}
+                      formState={formState}
+                      setValue={setValue}
+                    />
                   ) : (
                     <ExistingMintForm
                       register={register}
