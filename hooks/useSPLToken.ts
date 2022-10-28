@@ -4,12 +4,16 @@ import useSWR from "swr";
 import { getMint, Mint } from "@solana/spl-token-2";
 import { toast } from "react-toastify";
 
-const fetcher = async (
-  mintAddress: PublicKey,
-  connection: Connection
-): Promise<Mint> => {
-  const mint = await getMint(connection, mintAddress, "confirmed");
-  return mint;
+const fetcher = async ({
+  connection,
+  mintAddress,
+}: {
+  connection: Connection;
+  mintAddress?: PublicKey;
+}): Promise<Mint> => {
+  if (!mintAddress) throw new Error("No mint address provided");
+
+  return getMint(connection, mintAddress, "confirmed");
 };
 
 export const useSPLToken = (mintAddress: PublicKey | undefined) => {
@@ -20,16 +24,19 @@ export const useSPLToken = (mintAddress: PublicKey | undefined) => {
     error,
     isValidating,
     mutate,
-  } = useSWR(() => mintAddress && [mintAddress, connection], fetcher, {
-    revalidateOnFocus: false,
-    // revalidateOnMount: false,
-    // shouldRetryOnError: false,
-    errorRetryCount: 1,
-    onError: (err) => {
-      console.error(err);
-      toast.error("Failed to SPL Token data.");
-    },
-  });
+  } = useSWR(
+    () =>
+      mintAddress && ["mint", mintAddress.toBase58(), connection.rpcEndpoint],
+    () => fetcher({ connection, mintAddress }),
+    {
+      revalidateOnFocus: false,
+      errorRetryCount: 1,
+      onError: (err) => {
+        console.error(err);
+        toast.error("Failed to SPL Token data.");
+      },
+    }
+  );
 
   const loading = !mint && !error;
 

@@ -1,6 +1,5 @@
 import { useRouter } from "next/router";
 import { ReactNode } from "react";
-import { getLayout } from "../../components/layouts/SiteLayout";
 import { useSerumMarket } from "../../hooks/useSerumMarket";
 
 import { EventQueueCard } from "../../components/market/EventQueue";
@@ -11,6 +10,7 @@ import { VaultDisplay } from "../../components/market/Vault";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { ActionCenter } from "../../components/market/ActionCenter";
 import { useSolana } from "../../context";
+import { getSearchLayout } from "../../components/layouts/SearchLayout";
 
 const MarketPage = () => {
   const router = useRouter();
@@ -28,7 +28,7 @@ const MarketPage = () => {
 
   return (
     <MarketProvider serumMarket={serumMarket} walletAddress={wallet.publicKey}>
-      <div className="flex flex-col items-stretch space-y-4 my-8">
+      <div className="flex flex-col items-stretch space-y-4">
         <TokenDisplay />
         <OverviewTable />
         <VaultDisplay />
@@ -39,6 +39,6 @@ const MarketPage = () => {
   );
 };
 
-MarketPage.getLayout = (page: ReactNode) => getLayout(page, "Market");
+MarketPage.getLayout = (page: ReactNode) => getSearchLayout(page, "Market");
 
 export default MarketPage;

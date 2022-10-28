@@ -3,25 +3,34 @@ import { useConnection } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { toast } from "react-toastify";
 import useSWR from "swr";
-import { useProgram } from "../context/SerumContext";
+import { useSerum } from "../context/SerumContext";
 
-const fetcher = async (
-  marketAddress: string,
-  programID: PublicKey,
-  connection: Connection
-): Promise<Market> => {
+const fetcher = async ({
+  marketAddress,
+  programID,
+  connection,
+}: {
+  marketAddress?: string;
+  programID: PublicKey;
+  connection: Connection;
+}): Promise<Market> => {
+  if (!marketAddress) {
+    throw new Error("No market address provided");
+  }
+
   const market = await Market.load(
     connection,
     new PublicKey(marketAddress),
     { commitment: "confirmed" },
     programID
   );
+
   return market;
 };
 
 export const useSerumMarket = (marketAddress: string | undefined) => {
   const { connection } = useConnection();
-  const { programID } = useProgram();
+  const { programID } = useSerum();
 
   const {
     data: serumMarket,
@@ -29,15 +38,19 @@ export const useSerumMarket = (marketAddress: string | undefined) => {
     isValidating,
     mutate,
   } = useSWR(
-    () => marketAddress && programID && [marketAddress, programID, connection],
-    fetcher,
+    () =>
+      marketAddress && [
+        "market",
+        marketAddress,
+        programID.toBase58(), // NOTE: programID kept here since we want to refetch market when programID changes
+        connection.rpcEndpoint,
+      ],
+    () => fetcher({ marketAddress, programID, connection }),
     {
       revalidateOnFocus: false,
-      // revalidateOnMount: false,
-      // shouldRetryOnError: false,
       errorRetryCount: 1,
       onError: (err) => {
-        console.error(err);
+        console.error("[explorer]: failed to fetch market", err);
         toast.error("Failed to load market.");
       },
     }

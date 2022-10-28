@@ -2,7 +2,6 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { Listbox, RadioGroup, Transition } from "@headlessui/react";
 import { classNames, getExplorerLink } from "../../../utils/general";
 import React, { Fragment } from "react";
-import { ChevronDownIcon } from "@heroicons/react/outline";
 import { toast } from "react-toastify";
 import { useMarket } from "../../../context/market";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
@@ -11,6 +10,7 @@ import { useTokenBalance } from "../../../hooks";
 import { getAssociatedTokenAddress } from "@solana/spl-token-2";
 import { sendWalletTransaction } from "../../../utils/transaction";
 import Loader from "../../common/Loader";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 
 type LabelValue<T> = {
   label: string;
@@ -165,8 +165,10 @@ export const PlaceOrder = () => {
     return (
       <div
         className={classNames(
-          "py-2 px-4 cursor-pointer",
-          checked ? "bg-cyan-700" : "bg-cyan-800 text-cyan-600"
+          "py-2 px-4 cursor-pointer text-sm",
+          checked
+            ? "bg-slate-600 text-slate-200"
+            : "bg-slate-800 text-slate-600"
         )}
       >
         {children}
@@ -191,18 +193,16 @@ export const PlaceOrder = () => {
   };
 
   return (
-    <div className="p-3 bg-cyan-900 rounded-md">
-      <h3 className="text-lg font-semibold">Place Order</h3>
-      <form onSubmit={handleSubmit(handlePlaceOrder)} className="space-y-3">
-        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-4">
+    <div className="p-3 bg-slate-700 rounded-md">
+      <h3 className="text-lg text-slate-200">Place Order</h3>
+      <form onSubmit={handleSubmit(handlePlaceOrder)}>
+        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-4 mb-2">
           <RadioGroup
             value={watchSide}
             onChange={setSide}
             className="space-y-1"
           >
-            <RadioGroup.Label className="text-sm text-cyan-200 font-light">
-              Side
-            </RadioGroup.Label>
+            <RadioGroup.Label className="input-label">Side</RadioGroup.Label>
             <div className="flex rounded-md overflow-hidden w-min">
               <RadioGroup.Option value="buy">
                 {({ checked }) => (
@@ -217,14 +217,12 @@ export const PlaceOrder = () => {
             </div>
           </RadioGroup>
           <div className="space-y-1">
-            <label className="text-sm text-cyan-200 font-light">
-              Order Type
-            </label>
+            <label className="input-label">Order Type</label>
             <Listbox value={watchOrderType} onChange={setOrderType}>
               <div className="relative">
-                <Listbox.Button className="relative px-4 py-2 rounded-md bg-cyan-700 sm:w-64 min-w-full flex items-center justify-between">
+                <Listbox.Button className="relative px-4 text-sm py-2 rounded-md bg-slate-600 text-slate-200 sm:w-64 min-w-full flex items-center justify-between">
                   {watchOrderType.label}
-                  <ChevronDownIcon className="h-5 w-5 text-cyan-300" />
+                  <ChevronDownIcon className="h-5 w-5 text-slate-200" />
                 </Listbox.Button>
                 <Transition
                   as={Fragment}
@@ -232,13 +230,15 @@ export const PlaceOrder = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-lg sm:text-sm bg-cyan-700 w-full z-50">
+                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-2xl sm:text-sm bg-slate-600 w-full z-50">
                     {orderTypes.map((orderType) => (
                       <Listbox.Option
                         key={orderType.value}
                         className={({ active }) =>
                           `relative cursor-pointer select-none py-2 px-4 ${
-                            active ? "bg-cyan-600 text-cyan-200" : "text-white"
+                            active
+                              ? "bg-slate-500 text-slate-100"
+                              : "text-slate-400"
                           }`
                         }
                         value={orderType}
@@ -257,17 +257,15 @@ export const PlaceOrder = () => {
           </div>
 
           <div className="space-y-1">
-            <label className="text-sm text-cyan-200 font-light">
-              Self-Trade Behaviour
-            </label>
+            <label className="input-label">Self-Trade Behaviour</label>
             <Listbox
               value={watchSelfTradeBehaviour}
               onChange={setSelfTradeBehaviour}
             >
               <div className="relative">
-                <Listbox.Button className="relative px-4 py-2 rounded-md bg-cyan-700 sm:w-48 min-w-full flex items-center justify-between">
+                <Listbox.Button className="relative px-4 py-2 text-sm rounded-md bg-slate-600 text-slate-200 sm:w-48 min-w-full flex items-center justify-between">
                   {watchSelfTradeBehaviour.label}
-                  <ChevronDownIcon className="h-5 w-5 text-cyan-300" />
+                  <ChevronDownIcon className="h-5 w-5 text-slate-200" />
                 </Listbox.Button>
                 <Transition
                   as={Fragment}
@@ -275,13 +273,15 @@ export const PlaceOrder = () => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-lg sm:text-sm bg-cyan-700 w-full">
+                  <Listbox.Options className="absolute mt-1 rounded-md py-1 text-base shadow-2xl sm:text-sm bg-slate-600 w-full z-10 ">
                     {selfTradeBehaviours.map((behaviour) => (
                       <Listbox.Option
                         key={behaviour.value}
                         className={({ active }) =>
                           `relative cursor-pointer select-none py-2 px-4 ${
-                            active ? "bg-cyan-600 text-cyan-200" : "text-white"
+                            active
+                              ? "bg-slate-500 text-slate-100"
+                              : "text-slate-400"
                           }`
                         }
                         value={behaviour}
@@ -299,29 +299,29 @@ export const PlaceOrder = () => {
             </Listbox>
           </div>
         </div>
-        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-4">
+        <div className="flex flex-col space-y-2 sm:space-y-0 sm:flex-row sm:space-x-4 mb-6">
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm text-cyan-200 font-light">Size</span>
+              <span className="input-label">Size</span>
             </label>
             <input
               {...register("size", {
                 required: true,
                 pattern: /^[1-9]\d*(\.\d+)?$/,
               })}
-              className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-600 focus:outline-none"
+              className="px-4 py-2 w-full rounded input-2 focus-style"
             />
           </div>
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm text-cyan-200 font-light">Price</span>
+              <span className="input-label">Price</span>
             </label>
             <input
               {...register("price", {
                 required: true,
                 pattern: /^[1-9]\d*(\.\d+)?$/,
               })}
-              className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-600 focus:outline-none"
+              className="px-4 py-2 w-full rounded input-2 focus-style"
             />
           </div>
         </div>
@@ -337,7 +337,7 @@ export const PlaceOrder = () => {
             baseBalance?.uiAmount === 0 ||
             quoteBalance?.uiAmount === 0
           }
-          className="primary-btn"
+          className="primary-btn focus-style"
         >
           {isSubmitting ? (
             <>

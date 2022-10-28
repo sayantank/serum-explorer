@@ -1,7 +1,6 @@
-import { MouseEventHandler, useState } from "react";
-import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { MouseEventHandler, useMemo, useState } from "react";
 import { DexInstructions, OpenOrders } from "@project-serum/serum";
-import { useProgram, useSolana } from "../../../context";
+import { useSerum, useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
 import {
   getExplorerAccountLink,
@@ -16,6 +15,7 @@ import Loader from "../../common/Loader";
 import BN from "bn.js";
 import { Transaction } from "@solana/web3.js";
 import { MAX_U128 } from "../../../utils/constants";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 type OpenOrderCardProps = {
   openOrder: OpenOrders;
@@ -24,7 +24,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   const { connection } = useConnection();
   const wallet = useWallet();
   const { cluster } = useSolana();
-  const { programID } = useProgram();
+  const { programID } = useSerum();
   const {
     baseMetadata,
     quoteMetadata,
@@ -41,11 +41,14 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   const [isSettling, setIsSettling] = useState(false);
 
   const [isClosing, setIsClosing] = useState(false);
-  const canClose =
-    !canSettle &&
-    !orders.data?.filter(
-      (o) => o.openOrdersAddress.toBase58() == openOrder.address.toBase58()
-    ).length;
+  const canClose = useMemo(() => {
+    return (
+      !canSettle &&
+      !orders.data?.filter(
+        (o) => o.openOrdersAddress.toBase58() == openOrder.address.toBase58()
+      ).length
+    );
+  }, [orders.data, openOrder.address, canSettle]);
 
   const handleSettle: MouseEventHandler<HTMLButtonElement> = async (e) => {
     e.preventDefault();
@@ -168,9 +171,9 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
   }
 
   return (
-    <div className="p-3 rounded-md flex flex-col space-y-2 bg-cyan-900">
+    <div className="p-3 rounded-md flex flex-col space-y-2 bg-slate-600">
       <div>
-        <h3 className="text-sm text-cyan-200 font-light">Address</h3>
+        <h3 className="input-label">Address</h3>
         <div className="flex items-center space-x-1">
           <p className="">{openOrder.address.toString().slice(0, 10)}...</p>
           <a
@@ -178,16 +181,16 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer text-cyan-400" />
           </a>
         </div>
       </div>
       <div className="flex justify-between">
         <div className="flex-1">
-          <h3 className="text-sm text-cyan-200 font-light">
+          <h3 className="input-label">
             Free {baseMetadata ? baseMetadata.data.data.symbol : "Base Tokens"}
           </h3>
-          <p className="text-lg font-bold">
+          <p className="text-lg font-medium">
             {tokenAtomicsToPrettyDecimal(
               openOrder.baseTokenFree,
               baseMint.decimals
@@ -195,11 +198,11 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
           </p>
         </div>
         <div className="flex-1">
-          <h3 className="text-sm text-cyan-200 font-light">
+          <h3 className="input-label">
             Free{" "}
             {quoteMetadata ? quoteMetadata.data.data.symbol : "Quote Tokens"}
           </h3>
-          <p className="text-lg font-bold">
+          <p className="text-lg font-medium">
             {tokenAtomicsToPrettyDecimal(
               openOrder.quoteTokenFree,
               quoteMint.decimals
@@ -208,7 +211,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
         </div>
       </div>
       <button
-        className="primary-btn"
+        className="bg-slate-500 py-2 text-sm rounded-md hover:bg-slate-400 transition-colors focus-style"
         onClick={handleSettle}
         disabled={
           !canSettle || isSettling || !serumMarket || !baseMint || !quoteMint
@@ -223,7 +226,7 @@ const OpenOrderCard = ({ openOrder }: OpenOrderCardProps) => {
         )}
       </button>
       <button
-        className="critical-btn"
+        className="bg-rose-400 py-2 text-sm rounded-md hover:bg-rose-400 transition-colors focus-style disabled:opacity-40"
         onClick={handleClose}
         disabled={!canClose || !serumMarket}
       >

@@ -17,9 +17,9 @@ export const EventList = ({
 }: EventListProps) => {
   const getColor = (eventFlags: EventFlags) => {
     if (eventFlags.fill) {
-      return "bg-emerald-400";
+      return "bg-teal-400";
     } else if (eventFlags.out) {
-      return "bg-indigo-400";
+      return "bg-blue-400";
     } else {
       return "bg-gray-400";
     }

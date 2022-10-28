@@ -95,9 +95,9 @@ export function tokenAtomicsToPrettyDecimal(
  */
 export function formatNumber(
   num: number | string,
-  thousand: string = ",",
-  decimal: string = ".",
-  universal: string = "\\d"
+  thousand = ",",
+  decimal = ".",
+  universal = "\\d"
 ) {
   const number =
     decimal === "." ? num.toString() : num.toString().replace(".", decimal);

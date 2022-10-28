@@ -1,4 +1,4 @@
-import { ExternalLinkIcon } from "@heroicons/react/outline";
+import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 import { Order } from "@project-serum/serum/lib/market";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { MouseEventHandler, useState } from "react";
@@ -73,22 +73,22 @@ export const OrderListItem = ({ order }: { order: Order }) => {
       <td className="p-2">
         <div
           className={classNames(
-            "mx-auto flex w-min rounded-md text-sm items-center justify-center py-1 px-2",
-            order.side === "buy" ? "bg-green-500" : "bg-red-500"
+            "mx-auto flex w-min rounded-md text-xs text-slate-600 items-center justify-center py-1 px-2",
+            order.side === "buy" ? "bg-lime-400" : "bg-rose-400"
           )}
         >
           {order.side === "buy" ? "Buy" : "Sell"}
         </div>
       </td>
       <td className="p-2">
-        <p className="text-center">{order.size}</p>
+        <p className="text-center text-slate-300 text-sm">{order.size}</p>
       </td>
       <td className="p-2">
-        <p className="text-center">{order.price}</p>
+        <p className="text-center text-slate-300 text-sm">{order.price}</p>
       </td>
       <td className="p-2">
         <div className="flex items-center justify-center space-x-2">
-          <p className="text-center">
+          <p className="text-center text-slate-300 text-sm">
             {order.openOrdersAddress.toString().slice(0, 10)}...
           </p>
           <a
@@ -99,14 +99,14 @@ export const OrderListItem = ({ order }: { order: Order }) => {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <ExternalLinkIcon className="h-4 w-4 cursor-pointer" />
+            <ArrowTopRightOnSquareIcon className="h-4 w-4 cursor-pointer text-cyan-400" />
           </a>
         </div>
       </td>
       <td className="p-2 flex">
         <button
           onClick={handleCancel}
-          className="py-1 text-sm px-3 w-min bg-cyan-700 hover:bg-cyan-800 transition-colors rounded-md flex items-center justify-center space-x-1"
+          className="py-1 text-xs px-3 w-min bg-slate-500 hover:bg-slate-400 transition-colors focus-style rounded-md flex items-center justify-center space-x-1"
           disabled={isCancelling || !serumMarket}
         >
           {isCancelling ? (

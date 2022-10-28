@@ -9,7 +9,7 @@ import {
   SlopeWalletAdapter,
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
-import { clusterApiUrl, Connection } from "@solana/web3.js";
+import { clusterApiUrl } from "@solana/web3.js";
 import { useRouter } from "next/router";
 import {
   createContext,
@@ -22,7 +22,7 @@ import {
 
 export type ClusterType = "mainnet-beta" | "testnet" | "devnet" | "custom";
 
-type SolanaCluster = {
+export type SolanaCluster = {
   label: string;
   network: ClusterType;
   endpoint: string;
@@ -44,7 +44,7 @@ const SolanaContext = createContext<SolanaContextType | null>(null);
 
 export const CLUSTER_LOCAL_STORAGE_KEY = "cluster-serum-explorer";
 
-export const LOCALNET_URL = "http://localhost:8899";
+export const LOCALNET_URL = "http://localhost:8899/";
 
 export const CLUSTERS: SolanaCluster[] = [
   {
@@ -76,13 +76,6 @@ export const CLUSTERS: SolanaCluster[] = [
 
 export const CUSTOM_RPC_CLUSTER = CLUSTERS[CLUSTERS.length - 1];
 
-export const isActiveCluster = (
-  cluster: SolanaCluster,
-  connection: Connection
-) => {
-  return connection.rpcEndpoint === cluster.endpoint;
-};
-
 export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const [cluster, _setCluster] = useState(CLUSTERS[0]);
   const [customEndpoint, _setCustomEndpoint] = useState(LOCALNET_URL);
@@ -90,7 +83,7 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
   const router = useRouter();
 
   const endpoint = useMemo(() => {
-    if (cluster.label === "Custom RPC") {
+    if (cluster.network === "custom") {
       return customEndpoint;
     }
     return cluster.endpoint;
@@ -152,6 +145,10 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
 
   useEffect(() => {
     if (router.query.customRPC) {
+      _setCluster({
+        ...CLUSTERS[3],
+        endpoint: router.query.customRPC as string,
+      });
       _setCustomEndpoint(router.query.customRPC as string);
     }
   }, [router.query.customRPC]);

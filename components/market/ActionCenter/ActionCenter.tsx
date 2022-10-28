@@ -10,8 +10,8 @@ export const ActionCenter = () => {
   if (!wallet || !wallet.publicKey) return null;
 
   return (
-    <div className="bg-cyan-800 p-4 rounded-md flex flex-col space-y-4">
-      <h2 className="card-header">Action Center</h2>
+    <div className="bg-slate-800 border border-slate-700 p-4 rounded-md flex flex-col space-y-4">
+      <h2 className="card-header text-slate-200">Action Center</h2>
       <UserDetails />
       <PlaceOrder />
       <OrderList />

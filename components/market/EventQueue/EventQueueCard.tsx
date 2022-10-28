@@ -1,4 +1,3 @@
-import { RefreshIcon } from "@heroicons/react/outline";
 import { Tab } from "@headlessui/react";
 import { Event } from "@project-serum/serum/lib/queue";
 import { Fragment, useEffect, useState } from "react";
@@ -7,6 +6,7 @@ import { EventData } from "./EventData";
 import { EventList } from "./EventList";
 import { classNames } from "../../../utils/general";
 import { Cranker } from "./Cranker";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 export const EventQueueCard = () => {
   const { eventQueue } = useMarket();
@@ -34,10 +34,8 @@ export const EventQueueCard = () => {
           <button
             type="button"
             className={classNames(
-              "rounded-full flex items-center justify-center py-3 px-4 flex-1 focus:outline-none border-cyan-600 border-2",
-              selected
-                ? "bg-cyan-700 font-semibold"
-                : "bg-transparent font-medium"
+              "rounded-full flex items-center justify-center py-3 px-4 flex-1 focus:outline-none border-slate-600 border-2 text-slate-200 focus-style",
+              selected ? "bg-slate-700 font-medium" : "bg-transparent"
             )}
           >
             {title}
@@ -48,7 +46,7 @@ export const EventQueueCard = () => {
   };
 
   return (
-    <div className="bg-cyan-800 flex flex-col space-y-4 rounded">
+    <div className="bg-slate-800 flex flex-col space-y-4 rounded border border-slate-700">
       <Tab.Group>
         {({ selectedIndex: tabIndex }) => (
           <>
@@ -65,7 +63,7 @@ export const EventQueueCard = () => {
                     selectedIndex={selectedIndex}
                     tabIndex={tabIndex}
                   />
-                  <RefreshIcon
+                  <ArrowPathIcon
                     className={`h-5 w-5 cursor-pointer ${
                       eventQueue.isValidating ? "animate-spin" : null
                     }`}
@@ -75,9 +73,11 @@ export const EventQueueCard = () => {
               </>
             ) : (
               <div className="px-4 flex justify-between items-center w-full ">
-                <p className="text-sm font-light">No events to show.</p>
-                <RefreshIcon
-                  className={`h-5 w-5 cursor-pointer ${
+                <p className="text-sm font-light text-slate-400">
+                  No events to crank.
+                </p>
+                <ArrowPathIcon
+                  className={`h-5 w-5 cursor-pointer text-cyan-400 ${
                     eventQueue.isValidating ? "animate-spin" : null
                   }`}
                   onClick={() => eventQueue.mutate()}

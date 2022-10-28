@@ -92,20 +92,20 @@ export const Cranker = () => {
         >
           <div className="w-full flex flex-col space-y-1">
             <label>
-              <span className="text-sm text-cyan-200 font-light">
+              <span className="input-label text-slate-300">
                 Max no. of Events
               </span>
             </label>
             <input
               defaultValue={10}
               {...register("numEvents", { required: true })}
-              className="px-4 py-2 w-full rounded bg-transparent border-2 border-cyan-600 focus:outline-none"
+              className="px-4 py-2 w-full rounded input focus-style"
             />
           </div>
           <button
             type="submit"
             disabled={isCranking || eventQueue.data?.length === 0}
-            className="w-full p-2 bg-cyan-600 hover:bg-cyan-700 transition-all font-semibold rounded-md disabled:opacity-50 disabled:hover:bg-cyan-600"
+            className="w-full p-2 primary-btn focus-style"
           >
             Crank
           </button>
