@@ -89,6 +89,9 @@ const Home = () => {
               </p>
             </div>
           ) : null}
+          {serumMarketsLoading ? (
+            <div className="bg-slate-700 animate-pulse w-full h-8 rounded-lg" />
+          ) : null}
         </StatBlock>
         <StatBlock loading={loading}>
           <div>

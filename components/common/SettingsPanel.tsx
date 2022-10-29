@@ -196,7 +196,7 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
               </button>
             ))}
             {pinnedPrograms.length > 0 ? (
-              <div>
+              <div className="space-y-2">
                 {pinnedPrograms.map((programId) => (
                   <div
                     key={programId}
