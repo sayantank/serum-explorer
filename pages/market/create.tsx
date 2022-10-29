@@ -20,7 +20,7 @@ import {
 import BN from "bn.js";
 import ReactTooltip from "react-tooltip";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect, useMemo, useState } from "react";
+import { ReactNode, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import TransactionToast from "../../components/common/Toasts/TransactionToast";
@@ -33,26 +33,17 @@ import { getHeaderLayout } from "../../components/layouts/HeaderLayout";
 import { useSerum } from "../../context";
 import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
 import {
-  calculateTotalAccountSize,
+  EVENT_QUEUE_LENGTH,
   getVaultOwnerAndNonce,
+  ORDERBOOK_LENGTH,
+  REQUEST_QUEUE_LENGTH,
 } from "../../utils/serum";
 import {
   sendSignedTransaction,
   signTransactions,
 } from "../../utils/transaction";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
-
-const EVENT_QUEUE_LENGTH = 2978;
-const EVENT_SIZE = 88;
-const EVENT_QUEUE_HEADER_SIZE = 32;
-
-const REQUEST_QUEUE_LENGTH = 63;
-const REQUEST_SIZE = 80;
-const REQUEST_QUEUE_HEADER_SIZE = 32;
-
-const ORDERBOOK_LENGTH = 909;
-const ORDERBOOK_NODE_SIZE = 72;
-const ORDERBOOK_HEADER_SIZE = 40;
+import useSerumMarketAccounts from "../../hooks/useSerumMarketAccounts";
 
 const TRANSACTION_MESSAGES = [
   {
@@ -88,9 +79,9 @@ export type CreateMarketFormValues = {
   lotSize: number;
   useAdvancedOptions: boolean;
   tickSize: number;
-  eventQueueSize: number;
-  requestQueueSize: number;
-  orderbookSize: number;
+  eventQueueLength: number;
+  requestQueueLength: number;
+  orderbookLength: number;
 };
 
 const CreateMarket = () => {
@@ -105,79 +96,32 @@ const CreateMarket = () => {
     useForm<CreateMarketFormValues>({
       defaultValues: {
         createMint: true,
-        eventQueueSize: EVENT_QUEUE_LENGTH,
-        requestQueueSize: REQUEST_QUEUE_LENGTH,
-        orderbookSize: ORDERBOOK_LENGTH,
       },
     });
 
   const createMint = watch("createMint");
   const useAdvancedOptions = watch("useAdvancedOptions");
 
-  const eventQueueSize = watch("eventQueueSize");
-  const requestQueueSize = watch("requestQueueSize");
-  const orderbookSize = watch("orderbookSize");
+  const eventQueueLength = watch("eventQueueLength");
+  const requestQueueLength = watch("requestQueueLength");
+  const orderbookLength = watch("orderbookLength");
 
-  const totalEventQueueSize = useMemo(
-    () =>
-      calculateTotalAccountSize(
-        eventQueueSize,
-        EVENT_QUEUE_HEADER_SIZE,
-        EVENT_SIZE
-      ),
-    [eventQueueSize]
-  );
-
-  const totalRequestQueueSize = useMemo(
-    () =>
-      calculateTotalAccountSize(
-        requestQueueSize,
-        REQUEST_QUEUE_HEADER_SIZE,
-        REQUEST_SIZE
-      ),
-    [requestQueueSize]
-  );
-
-  const totalOrderbookSize = useMemo(
-    () =>
-      calculateTotalAccountSize(
-        orderbookSize,
-        ORDERBOOK_HEADER_SIZE,
-        ORDERBOOK_NODE_SIZE
-      ),
-    [orderbookSize]
-  );
-
-  // TODO: Refactor into hook
-  // https://stackoverflow.com/questions/61751728/asynchronous-calls-with-react-usememo
-  const [rentExemption, setRentExemption] = useState(0);
-  useEffect(() => {
-    let active = true;
-    calculateRentExemption();
-    return () => {
-      active = false;
-    };
-
-    async function calculateRentExemption() {
-      // setRentExemption(undefined) // this is optional
-      const res = await Promise.all([
-        connection.getMinimumBalanceForRentExemption(totalEventQueueSize),
-        connection.getMinimumBalanceForRentExemption(totalRequestQueueSize),
-        connection.getMinimumBalanceForRentExemption(totalOrderbookSize),
-      ]);
-      if (!active) {
-        return;
-      }
-      setRentExemption(res[0] + res[1] + 2 * res[2]); // eq + rq + 2 * ob
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [eventQueueSize, requestQueueSize, orderbookSize, connection.rpcEndpoint]);
+  const {
+    rentExemption,
+    totalEventQueueSize,
+    totalOrderbookSize,
+    totalRequestQueueSize,
+  } = useSerumMarketAccounts({
+    eventQueueLength,
+    requestQueueLength,
+    orderbookLength,
+  });
 
   useEffect(() => {
     if (!useAdvancedOptions) {
-      setValue("eventQueueSize", EVENT_QUEUE_LENGTH);
-      setValue("requestQueueSize", REQUEST_QUEUE_LENGTH);
-      setValue("orderbookSize", ORDERBOOK_LENGTH);
+      setValue("eventQueueLength", EVENT_QUEUE_LENGTH);
+      setValue("requestQueueLength", REQUEST_QUEUE_LENGTH);
+      setValue("orderbookLength", ORDERBOOK_LENGTH);
     }
   }, [useAdvancedOptions, setValue]);
 
@@ -409,7 +353,7 @@ const CreateMarket = () => {
       SystemProgram.createAccount({
         newAccountPubkey: marketAccounts.asks.publicKey,
         fromPubkey: wallet.publicKey,
-        space: orderBookRentExempt,
+        space: totalOrderbookSize,
         lamports: orderBookRentExempt,
         programId: programID,
       })
@@ -506,9 +450,11 @@ const CreateMarket = () => {
           });
         },
       });
+
       await sendSignedTransaction({
         signedTransaction: signedTransactions[2],
         connection,
+        skipPreflight: false,
         successCallback: async (txSig) => {
           toast(
             () => (
@@ -655,6 +601,11 @@ const CreateMarket = () => {
                     register={register}
                     setValue={setValue}
                     formState={formState}
+                    totalMarketAccountSizes={{
+                      totalEventQueueSize,
+                      totalRequestQueueSize,
+                      totalOrderbookSize,
+                    }}
                   />
                 </div>
               </div>

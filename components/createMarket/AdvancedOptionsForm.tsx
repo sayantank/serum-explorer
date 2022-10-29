@@ -8,12 +8,18 @@ type AdvancedOptionsFormProps = {
   register: UseFormRegister<CreateMarketFormValues>;
   formState: FormState<CreateMarketFormValues>;
   setValue: UseFormSetValue<CreateMarketFormValues>;
+  totalMarketAccountSizes: {
+    totalEventQueueSize: number;
+    totalRequestQueueSize: number;
+    totalOrderbookSize: number;
+  };
 };
 export default function AdvancedOptionsForm({
   useAdvancedOptions,
   register,
   setValue,
   formState: { errors },
+  totalMarketAccountSizes,
 }: AdvancedOptionsFormProps) {
   return (
     <div className="space-y-3">
@@ -54,22 +60,27 @@ export default function AdvancedOptionsForm({
           Event Queue Length
         </label>
         <div className="mt-1">
-          <input
-            type="number"
-            disabled={!useAdvancedOptions}
-            className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
-            {...register("eventQueueSize", {
-              min: {
-                value: 128,
-                message: "Must be at least 128",
-              },
-              max: 2978,
-              required: true,
-            })}
-          />
-          {errors?.eventQueueSize ? (
+          <div className="relative flex items-center">
+            <input
+              type="number"
+              disabled={!useAdvancedOptions}
+              className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
+              {...register("eventQueueLength", {
+                min: {
+                  value: 128,
+                  message: "Must be at least 128",
+                },
+                max: 2978,
+                required: true,
+              })}
+            />
+            <p className="absolute right-0 mr-2 text-sm text-slate-400">
+              {totalMarketAccountSizes.totalEventQueueSize} bytes
+            </p>
+          </div>
+          {errors?.eventQueueLength ? (
             <p className="text-xs text-red-400 mt-1">
-              {errors?.eventQueueSize?.message}
+              {errors?.eventQueueLength?.message}
             </p>
           ) : null}
         </div>
@@ -83,16 +94,21 @@ export default function AdvancedOptionsForm({
           Request Queue Length
         </label>
         <div className="mt-1">
-          <input
-            type="number"
-            disabled={!useAdvancedOptions}
-            className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
-            {...register("requestQueueSize", {
-              min: 1,
-              max: 100,
-              required: true,
-            })}
-          />
+          <div className="relative flex items-center">
+            <input
+              type="number"
+              disabled={!useAdvancedOptions}
+              className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
+              {...register("requestQueueLength", {
+                min: 1,
+                max: 100,
+                required: true,
+              })}
+            />
+            <p className="absolute right-0 mr-2 text-sm text-slate-400">
+              {totalMarketAccountSizes.totalRequestQueueSize} bytes
+            </p>
+          </div>
         </div>
       </div>
       <div
@@ -102,16 +118,21 @@ export default function AdvancedOptionsForm({
       >
         <label className="block text-xs text-slate-400">Orderbook Length</label>
         <div className="mt-1">
-          <input
-            type="number"
-            disabled={!useAdvancedOptions}
-            className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
-            {...register("orderbookSize", {
-              min: 1,
-              max: 1000,
-              required: true,
-            })}
-          />
+          <div className="relative flex items-center">
+            <input
+              type="number"
+              disabled={!useAdvancedOptions}
+              className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
+              {...register("orderbookLength", {
+                min: 1,
+                max: 1000,
+                required: true,
+              })}
+            />
+            <p className="absolute right-0 mr-2 text-sm text-slate-400">
+              {totalMarketAccountSizes.totalEventQueueSize} bytes
+            </p>
+          </div>
         </div>
       </div>
     </div>
