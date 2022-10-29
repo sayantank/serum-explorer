@@ -30,7 +30,7 @@ import ExistingMintForm from "../../components/createMarket/ExistingMintForm";
 import NewMintForm from "../../components/createMarket/NewMintForm";
 import TickerForm from "../../components/createMarket/TickerForm";
 import { getHeaderLayout } from "../../components/layouts/HeaderLayout";
-import { useSerum } from "../../context";
+import { useSerum, useSolana } from "../../context";
 import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
 import {
   EVENT_QUEUE_LENGTH,
@@ -90,6 +90,7 @@ const CreateMarket = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
 
+  const { cluster } = useSolana();
   const { programID } = useSerum();
 
   const { register, handleSubmit, watch, setValue, formState, clearErrors } =
@@ -482,6 +483,20 @@ const CreateMarket = () => {
       toast.error("Failed to create market.");
     }
   };
+
+  if (cluster.network === "mainnet-beta")
+    return (
+      <div className="space-y-4 mb-6">
+        <div>
+          <h1 className="text-2xl text-slate-200">Create Market</h1>
+        </div>
+        <div>
+          <p className="text-sm text-slate-400">
+            Unavailable for mainnet-beta.
+          </p>
+        </div>
+      </div>
+    );
 
   return (
     <>
