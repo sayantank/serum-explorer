@@ -18,27 +18,41 @@ import {
   TransactionInstruction,
 } from "@solana/web3.js";
 import BN from "bn.js";
+import ReactTooltip from "react-tooltip";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import TransactionToast from "../../components/common/Toasts/TransactionToast";
+import AdvancedOptionsForm from "../../components/createMarket/AdvancedOptionsForm";
 import CreateMintOption from "../../components/createMarket/CreateMintOption";
 import ExistingMintForm from "../../components/createMarket/ExistingMintForm";
 import NewMintForm from "../../components/createMarket/NewMintForm";
 import TickerForm from "../../components/createMarket/TickerForm";
 import { getHeaderLayout } from "../../components/layouts/HeaderLayout";
 import { useSerum } from "../../context";
-import { getVaultOwnerAndNonce } from "../../utils/serum";
+import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
+import {
+  calculateTotalAccountSize,
+  getVaultOwnerAndNonce,
+} from "../../utils/serum";
 import {
   sendSignedTransaction,
   signTransactions,
 } from "../../utils/transaction";
+import { InformationCircleIcon } from "@heroicons/react/24/solid";
 
-const REQUEST_QUEUE_SIZE = 5120 + 12; // https://github.com/mithraiclabs/psyoptions/blob/f0c9f73408a27676e0c7f156f5cae71f73f59c3f/programs/psy_american/src/lib.rs#L1003
-const EVENT_QUEUE_SIZE = 262144 + 12; // https://github.com/mithraiclabs/psyoptions-ts/blob/ba1888ea83e634e1c7a8dad820fe67d053cf3f5c/packages/psy-american/src/instructions/initializeSerumMarket.ts#L84
-const BIDS_SIZE = 65536 + 12; // Same reference as EVENT_QUEUE_SIZE
-const ASKS_SIZE = 65536 + 12; // Same reference as EVENT_QUEUE_SIZE
+const EVENT_QUEUE_LENGTH = 2978;
+const EVENT_SIZE = 88;
+const EVENT_QUEUE_HEADER_SIZE = 32;
+
+const REQUEST_QUEUE_LENGTH = 63;
+const REQUEST_SIZE = 80;
+const REQUEST_QUEUE_HEADER_SIZE = 32;
+
+const ORDERBOOK_LENGTH = 909;
+const ORDERBOOK_NODE_SIZE = 72;
+const ORDERBOOK_HEADER_SIZE = 40;
 
 const TRANSACTION_MESSAGES = [
   {
@@ -72,7 +86,11 @@ export type CreateMarketFormValues = {
   newMints?: NewMintFormValues;
   existingMints?: ExistingMintFormValues;
   lotSize: number;
+  useAdvancedOptions: boolean;
   tickSize: number;
+  eventQueueSize: number;
+  requestQueueSize: number;
+  orderbookSize: number;
 };
 
 const CreateMarket = () => {
@@ -87,10 +105,81 @@ const CreateMarket = () => {
     useForm<CreateMarketFormValues>({
       defaultValues: {
         createMint: true,
+        eventQueueSize: EVENT_QUEUE_LENGTH,
+        requestQueueSize: REQUEST_QUEUE_LENGTH,
+        orderbookSize: ORDERBOOK_LENGTH,
       },
     });
 
   const createMint = watch("createMint");
+  const useAdvancedOptions = watch("useAdvancedOptions");
+
+  const eventQueueSize = watch("eventQueueSize");
+  const requestQueueSize = watch("requestQueueSize");
+  const orderbookSize = watch("orderbookSize");
+
+  const totalEventQueueSize = useMemo(
+    () =>
+      calculateTotalAccountSize(
+        eventQueueSize,
+        EVENT_QUEUE_HEADER_SIZE,
+        EVENT_SIZE
+      ),
+    [eventQueueSize]
+  );
+
+  const totalRequestQueueSize = useMemo(
+    () =>
+      calculateTotalAccountSize(
+        requestQueueSize,
+        REQUEST_QUEUE_HEADER_SIZE,
+        REQUEST_SIZE
+      ),
+    [requestQueueSize]
+  );
+
+  const totalOrderbookSize = useMemo(
+    () =>
+      calculateTotalAccountSize(
+        orderbookSize,
+        ORDERBOOK_HEADER_SIZE,
+        ORDERBOOK_NODE_SIZE
+      ),
+    [orderbookSize]
+  );
+
+  // TODO: Refactor into hook
+  // https://stackoverflow.com/questions/61751728/asynchronous-calls-with-react-usememo
+  const [rentExemption, setRentExemption] = useState(0);
+  useEffect(() => {
+    let active = true;
+    calculateRentExemption();
+    return () => {
+      active = false;
+    };
+
+    async function calculateRentExemption() {
+      // setRentExemption(undefined) // this is optional
+      const res = await Promise.all([
+        connection.getMinimumBalanceForRentExemption(totalEventQueueSize),
+        connection.getMinimumBalanceForRentExemption(totalRequestQueueSize),
+        connection.getMinimumBalanceForRentExemption(totalOrderbookSize),
+      ]);
+      if (!active) {
+        return;
+      }
+      setRentExemption(res[0] + res[1] + 2 * res[2]); // eq + rq + 2 * ob
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [eventQueueSize, requestQueueSize, orderbookSize, connection.rpcEndpoint]);
+
+  useEffect(() => {
+    if (!useAdvancedOptions) {
+      setValue("eventQueueSize", EVENT_QUEUE_LENGTH);
+      setValue("requestQueueSize", REQUEST_QUEUE_LENGTH);
+      setValue("orderbookSize", ORDERBOOK_LENGTH);
+    }
+  }, [useAdvancedOptions, setValue]);
 
   useEffect(() => {
     if (createMint) {
@@ -280,9 +369,9 @@ const CreateMarket = () => {
       SystemProgram.createAccount({
         newAccountPubkey: marketAccounts.requestQueue.publicKey,
         fromPubkey: wallet.publicKey,
-        space: REQUEST_QUEUE_SIZE,
+        space: totalRequestQueueSize,
         lamports: await connection.getMinimumBalanceForRentExemption(
-          REQUEST_QUEUE_SIZE
+          totalRequestQueueSize
         ),
         programId: programID,
       })
@@ -293,21 +382,24 @@ const CreateMarket = () => {
       SystemProgram.createAccount({
         newAccountPubkey: marketAccounts.eventQueue.publicKey,
         fromPubkey: wallet.publicKey,
-        space: EVENT_QUEUE_SIZE,
+        space: totalEventQueueSize,
         lamports: await connection.getMinimumBalanceForRentExemption(
-          EVENT_QUEUE_SIZE
+          totalEventQueueSize
         ),
         programId: programID,
       })
     );
+
+    const orderBookRentExempt =
+      await connection.getMinimumBalanceForRentExemption(totalOrderbookSize);
 
     // create bids
     marketInstructions.push(
       SystemProgram.createAccount({
         newAccountPubkey: marketAccounts.bids.publicKey,
         fromPubkey: wallet.publicKey,
-        space: BIDS_SIZE,
-        lamports: await connection.getMinimumBalanceForRentExemption(BIDS_SIZE),
+        space: totalOrderbookSize,
+        lamports: orderBookRentExempt,
         programId: programID,
       })
     );
@@ -317,8 +409,8 @@ const CreateMarket = () => {
       SystemProgram.createAccount({
         newAccountPubkey: marketAccounts.asks.publicKey,
         fromPubkey: wallet.publicKey,
-        space: ASKS_SIZE,
-        lamports: await connection.getMinimumBalanceForRentExemption(ASKS_SIZE),
+        space: orderBookRentExempt,
+        lamports: orderBookRentExempt,
         programId: programID,
       })
     );
@@ -446,97 +538,137 @@ const CreateMarket = () => {
   };
 
   return (
-    <div className="space-y-4 mb-6">
-      <div>
-        <h1 className="text-2xl text-slate-200">Create Market</h1>
-      </div>
-      <form onSubmit={handleSubmit(handleCreateMarket)}>
-        <div className="space-y-4">
-          <div className="bg-slate-800 border border-slate-700 px-4 py-5 shadow rounded-lg sm:p-6">
-            <div className="md:grid md:grid-cols-3 md:gap-6">
-              <div className="md:col-span-1">
-                <h3 className="text-lg font-medium leading-6 text-slate-200">
-                  Mints
-                </h3>
-                <p className="mt-1 text-sm text-slate-400">
-                  Configure the mints for the tokens you want to create a market
-                  for.
-                </p>
-              </div>
-              <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
-                <div>
-                  <RadioGroup
-                    value={createMint}
-                    onChange={(value: boolean) => setValue("createMint", value)}
-                  >
-                    <RadioGroup.Label className="sr-only">
-                      Create Mint
-                    </RadioGroup.Label>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroup.Option
-                        value={true}
-                        className="flex-1 focus-style rounded-md"
-                      >
-                        {({ active, checked }) => (
-                          <CreateMintOption active={active} checked={checked}>
-                            <p>New</p>
-                          </CreateMintOption>
-                        )}
-                      </RadioGroup.Option>
-                      <RadioGroup.Option
-                        value={false}
-                        className="flex-1 focus-style rounded-md"
-                      >
-                        {({ active, checked }) => (
-                          <CreateMintOption active={active} checked={checked}>
-                            <p>Existing</p>
-                          </CreateMintOption>
-                        )}
-                      </RadioGroup.Option>
-                    </div>
-                  </RadioGroup>
-                </div>
-                <div>
-                  {createMint ? (
-                    <NewMintForm
-                      register={register}
-                      formState={formState}
-                      setValue={setValue}
-                    />
-                  ) : (
-                    <ExistingMintForm
-                      register={register}
-                      formState={formState}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="bg-slate-800 border border-slate-700 px-4 py-5 shadow rounded-lg sm:p-6">
-            <div className="md:grid md:grid-cols-3 md:gap-6">
-              <div className="md:col-span-1">
-                <h3 className="text-lg font-medium leading-6 text-slate-200">
-                  Tickers
-                </h3>
-                <p className="mt-1 text-sm text-slate-400">
-                  Configure the tick sizes, or lowest representable quantities
-                  of base and quote tokens.
-                </p>
-              </div>
-              <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
-                <TickerForm register={register} />
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end w-full">
-            <button className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors">
-              Submit
-            </button>
-          </div>
+    <>
+      <div className="space-y-4 mb-6">
+        <div>
+          <h1 className="text-2xl text-slate-200">Create Market</h1>
         </div>
-      </form>
-    </div>
+        <form onSubmit={handleSubmit(handleCreateMarket)}>
+          <div className="space-y-4">
+            <div className="bg-slate-800 border border-slate-700 px-4 py-5 shadow rounded-lg sm:p-6">
+              <div className="md:grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1">
+                  <h3 className="text-lg font-medium leading-6 text-slate-200">
+                    Mints
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Configure the mints for the tokens you want to create a
+                    market for.
+                  </p>
+                </div>
+                <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
+                  <div>
+                    <RadioGroup
+                      value={createMint}
+                      onChange={(value: boolean) =>
+                        setValue("createMint", value)
+                      }
+                    >
+                      <RadioGroup.Label className="sr-only">
+                        Create Mint
+                      </RadioGroup.Label>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroup.Option
+                          value={true}
+                          className="flex-1 focus-style rounded-md"
+                        >
+                          {({ active, checked }) => (
+                            <CreateMintOption active={active} checked={checked}>
+                              <p>New</p>
+                            </CreateMintOption>
+                          )}
+                        </RadioGroup.Option>
+                        <RadioGroup.Option
+                          value={false}
+                          className="flex-1 focus-style rounded-md"
+                        >
+                          {({ active, checked }) => (
+                            <CreateMintOption active={active} checked={checked}>
+                              <p>Existing</p>
+                            </CreateMintOption>
+                          )}
+                        </RadioGroup.Option>
+                      </div>
+                    </RadioGroup>
+                  </div>
+                  <div>
+                    {createMint ? (
+                      <NewMintForm
+                        register={register}
+                        formState={formState}
+                        setValue={setValue}
+                      />
+                    ) : (
+                      <ExistingMintForm
+                        register={register}
+                        formState={formState}
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-slate-800 border border-slate-700 px-4 py-5 shadow rounded-lg sm:p-6">
+              <div className="md:grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1">
+                  <h3 className="text-lg font-medium leading-6 text-slate-200">
+                    Tickers
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Configure the tick sizes, or lowest representable quantities
+                    of base and quote tokens.
+                  </p>
+                </div>
+                <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
+                  <TickerForm register={register} />
+                </div>
+              </div>
+            </div>
+            <div className="bg-slate-800 border border-slate-700 px-4 py-5 shadow rounded-lg sm:p-6">
+              <div className="md:grid md:grid-cols-3 md:gap-6">
+                <div className="md:col-span-1">
+                  <h3 className="text-lg font-medium leading-6 text-slate-200">
+                    Advanced Options
+                  </h3>
+                  <p className="mt-1 text-sm text-slate-400">
+                    Configure sizes for the different accounts used to create
+                    the market to adjust rent cost.
+                  </p>
+                  <div className="mt-6">
+                    <div className="mb-1 flex items-center space-x-1">
+                      <p className="text-xs text-slate-300">Rent Estimate </p>
+                      <InformationCircleIcon
+                        data-tip="Excluding vaults and mints."
+                        className="text-slate-400 h-4 w-4"
+                      />
+                    </div>
+
+                    <p className="text-lg text-cyan-400">
+                      {tokenAtomicsToPrettyDecimal(new BN(rentExemption), 9)}{" "}
+                      SOL{" "}
+                    </p>
+                  </div>
+                </div>
+                <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
+                  <AdvancedOptionsForm
+                    useAdvancedOptions={useAdvancedOptions}
+                    register={register}
+                    setValue={setValue}
+                    formState={formState}
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end w-full">
+              <button className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors">
+                Submit
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <ReactTooltip place="right" />
+    </>
   );
 };
 

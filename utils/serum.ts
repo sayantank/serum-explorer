@@ -19,3 +19,19 @@ export async function getVaultOwnerAndNonce(
     }
   }
 }
+
+export function calculateTotalAccountSize(
+  individualAccountSize: number,
+  accountHeaderSize: number,
+  length: number
+) {
+  const accountPadding = 12;
+  const minRequiredSize =
+    accountPadding + accountHeaderSize + length * individualAccountSize;
+
+  const modulo = minRequiredSize % 8;
+
+  return modulo <= 4
+    ? minRequiredSize + (4 - modulo)
+    : minRequiredSize + (8 - modulo + 4);
+}
