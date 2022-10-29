@@ -2,6 +2,7 @@
 import { RadioGroup } from "@headlessui/react";
 import { DexInstructions, Market } from "@project-serum/serum";
 import {
+  ACCOUNT_SIZE,
   createInitializeAccountInstruction,
   createInitializeMintInstruction,
   getMinimumBalanceForRentExemptMint,
@@ -42,8 +43,8 @@ import {
   sendSignedTransaction,
   signTransactions,
 } from "../../utils/transaction";
-import { InformationCircleIcon } from "@heroicons/react/24/solid";
 import useSerumMarketAccountSizes from "../../hooks/useSerumMarketAccountSizes";
+import useRentExemption from "../../hooks/useRentExemption";
 
 const TRANSACTION_MESSAGES = [
   {
@@ -107,8 +108,11 @@ const CreateMarket = () => {
   const requestQueueLength = watch("requestQueueLength");
   const orderbookLength = watch("orderbookLength");
 
+  const mintRent = useRentExemption(createMint ? MINT_SIZE : 0);
+  const vaultRent = useRentExemption(ACCOUNT_SIZE);
+
   const {
-    rentExemption,
+    marketRent,
     totalEventQueueSize,
     totalOrderbookSize,
     totalRequestQueueSize,
@@ -255,15 +259,19 @@ const CreateMarket = () => {
         SystemProgram.createAccount({
           fromPubkey: wallet.publicKey,
           newAccountPubkey: marketAccounts.baseVault.publicKey,
-          lamports: await connection.getMinimumBalanceForRentExemption(165),
-          space: 165,
+          lamports: await connection.getMinimumBalanceForRentExemption(
+            ACCOUNT_SIZE
+          ),
+          space: ACCOUNT_SIZE,
           programId: TOKEN_PROGRAM_ID,
         }),
         SystemProgram.createAccount({
           fromPubkey: wallet.publicKey,
           newAccountPubkey: marketAccounts.quoteVault.publicKey,
-          lamports: await connection.getMinimumBalanceForRentExemption(165),
-          space: 165,
+          lamports: await connection.getMinimumBalanceForRentExemption(
+            ACCOUNT_SIZE
+          ),
+          space: ACCOUNT_SIZE,
           programId: TOKEN_PROGRAM_ID,
         }),
         createInitializeAccountInstruction(
@@ -484,20 +492,6 @@ const CreateMarket = () => {
     }
   };
 
-  if (cluster.network === "mainnet-beta")
-    return (
-      <div className="space-y-4 mb-6">
-        <div>
-          <h1 className="text-2xl text-slate-200">Create Market</h1>
-        </div>
-        <div>
-          <p className="text-sm text-slate-400">
-            Unavailable for mainnet-beta.
-          </p>
-        </div>
-      </div>
-    );
-
   return (
     <>
       <div className="space-y-4 mb-6">
@@ -597,15 +591,16 @@ const CreateMarket = () => {
                   </p>
                   <div className="mt-6">
                     <div className="mb-1 flex items-center space-x-1">
-                      <p className="text-xs text-slate-300">Rent Estimate </p>
-                      <InformationCircleIcon
-                        data-tip="Excluding vaults and mints."
-                        className="text-slate-400 h-4 w-4"
-                      />
+                      <p className="text-xs text-slate-300">
+                        Total Rent Estimate{" "}
+                      </p>
                     </div>
 
                     <p className="text-lg text-cyan-400">
-                      {tokenAtomicsToPrettyDecimal(new BN(rentExemption), 9)}{" "}
+                      {tokenAtomicsToPrettyDecimal(
+                        new BN(marketRent + vaultRent * 2 + mintRent * 2),
+                        9
+                      )}{" "}
                       SOL{" "}
                     </p>
                   </div>
@@ -626,8 +621,13 @@ const CreateMarket = () => {
               </div>
             </div>
             <div className="flex justify-end w-full">
-              <button className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors">
-                Submit
+              <button
+                disabled={cluster.network === "mainnet-beta"}
+                className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors disabled:opacity-20"
+              >
+                {cluster.network === "mainnet-beta"
+                  ? "Unavailable for mainnet-beta"
+                  : "Create"}
               </button>
             </div>
           </div>

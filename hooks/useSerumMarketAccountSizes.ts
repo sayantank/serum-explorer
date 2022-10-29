@@ -1,5 +1,4 @@
-import { useConnection } from "@solana/wallet-adapter-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import {
   calculateTotalAccountSize,
   EVENT_QUEUE_HEADER_SIZE,
@@ -9,6 +8,7 @@ import {
   REQUEST_QUEUE_HEADER_SIZE,
   REQUEST_SIZE,
 } from "../utils/serum";
+import useRentExemption from "./useRentExemption";
 
 type useSerumMarketAccountSizesProps = {
   eventQueueLength: number;
@@ -20,8 +20,6 @@ export default function useSerumMarketAccountSizes({
   requestQueueLength,
   orderbookLength,
 }: useSerumMarketAccountSizesProps) {
-  const { connection } = useConnection();
-
   const totalEventQueueSize = useMemo(
     () =>
       calculateTotalAccountSize(
@@ -52,36 +50,12 @@ export default function useSerumMarketAccountSizes({
     [orderbookLength]
   );
 
-  const [rentExemption, setRentExemption] = useState(0);
-  useEffect(() => {
-    let active = true;
-    calculateRentExemption();
-    return () => {
-      active = false;
-    };
-
-    async function calculateRentExemption() {
-      // setRentExemption(undefined) // this is optional
-      const res = await Promise.all([
-        connection.getMinimumBalanceForRentExemption(totalEventQueueSize),
-        connection.getMinimumBalanceForRentExemption(totalRequestQueueSize),
-        connection.getMinimumBalanceForRentExemption(totalOrderbookSize),
-      ]);
-      if (!active) {
-        return;
-      }
-      setRentExemption(res[0] + res[1] + 2 * res[2]); // eq + rq + 2 * ob
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    totalEventQueueSize,
-    totalRequestQueueSize,
-    totalOrderbookSize,
-    connection.rpcEndpoint,
-  ]);
+  const eventQueueRent = useRentExemption(totalEventQueueSize);
+  const requestQueueRent = useRentExemption(totalRequestQueueSize);
+  const orderbookRent = useRentExemption(totalOrderbookSize);
 
   return {
-    rentExemption,
+    marketRent: eventQueueRent + requestQueueRent + 2 * orderbookRent,
     totalEventQueueSize,
     totalRequestQueueSize,
     totalOrderbookSize,
