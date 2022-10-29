@@ -10,16 +10,16 @@ import {
   REQUEST_SIZE,
 } from "../utils/serum";
 
-type useSerumMarketAccountsProps = {
+type useSerumMarketAccountSizesProps = {
   eventQueueLength: number;
   requestQueueLength: number;
   orderbookLength: number;
 };
-export default function useSerumMarketAccounts({
+export default function useSerumMarketAccountSizes({
   eventQueueLength,
   requestQueueLength,
   orderbookLength,
-}: useSerumMarketAccountsProps) {
+}: useSerumMarketAccountSizesProps) {
   const { connection } = useConnection();
 
   const totalEventQueueSize = useMemo(

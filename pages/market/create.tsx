@@ -43,7 +43,7 @@ import {
   signTransactions,
 } from "../../utils/transaction";
 import { InformationCircleIcon } from "@heroicons/react/24/solid";
-import useSerumMarketAccounts from "../../hooks/useSerumMarketAccounts";
+import useSerumMarketAccountSizes from "../../hooks/useSerumMarketAccountSizes";
 
 const TRANSACTION_MESSAGES = [
   {
@@ -111,7 +111,7 @@ const CreateMarket = () => {
     totalEventQueueSize,
     totalOrderbookSize,
     totalRequestQueueSize,
-  } = useSerumMarketAccounts({
+  } = useSerumMarketAccountSizes({
     eventQueueLength,
     requestQueueLength,
     orderbookLength,

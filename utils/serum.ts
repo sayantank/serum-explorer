@@ -47,3 +47,15 @@ export function calculateTotalAccountSize(
     ? minRequiredSize + (4 - modulo)
     : minRequiredSize + (8 - modulo + 4);
 }
+
+export function calculateAccountLength(
+  totalAccountSize: number,
+  accountHeaderSize: number,
+  individualAccountSize: number
+) {
+  const accountPadding = 12;
+  return Math.floor(
+    (totalAccountSize - accountPadding - accountHeaderSize) /
+      individualAccountSize
+  );
+}

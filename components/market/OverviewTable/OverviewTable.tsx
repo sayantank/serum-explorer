@@ -1,11 +1,25 @@
+import { useEffect } from "react";
 import { useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
+import useSerumMarketAccountLengths from "../../../hooks/useSerumMarketAccountLengths";
 import { getExplorerAccountLink } from "../../../utils/general";
 import { DataTable, DataTableRow } from "../../common/DataTable";
 
 export const OverviewTable = () => {
   const { cluster } = useSolana();
   const { serumMarket } = useMarket();
+
+  useEffect(() => {
+    console.log("[explorer] serumMarket", serumMarket?.decoded);
+  }, [serumMarket]);
+
+  const { eventQueueLength, requestQueueLength, bidsLength, asksLength } =
+    useSerumMarketAccountLengths({
+      eventQueueAddress: serumMarket?.decoded.eventQueue,
+      requestQueueAddress: serumMarket?.decoded.requestQueue,
+      bidsAddress: serumMarket?.decoded.bids,
+      asksAddress: serumMarket?.decoded.asks,
+    });
 
   if (!serumMarket) {
     return null;
@@ -46,6 +60,16 @@ export const OverviewTable = () => {
           label="Min. Order Size"
           value={serumMarket.minOrderSize.toString()}
         />
+        <DataTableRow
+          label="Event Queue Length"
+          value={eventQueueLength.toString()}
+        />
+        <DataTableRow
+          label="Request Queue Length"
+          value={requestQueueLength.toString()}
+        />
+        <DataTableRow label="Bids Length" value={bidsLength.toString()} />
+        <DataTableRow label="Asks Length" value={asksLength.toString()} />
       </DataTable>
     </div>
   );
