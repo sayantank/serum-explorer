@@ -38,7 +38,6 @@ type SettingPanelProps = {
 
 const SettingsPanel = ({ close }: SettingPanelProps) => {
   const router = useRouter();
-  const { network } = router.query;
 
   const wallet = useWallet();
   const { programID, setProgramID } = useSerum();
@@ -116,22 +115,20 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
             Decoder
           </p>
         </button>
-        {network ? (
-          <button
-            onClick={() => {
-              router.push({
-                pathname: `/market/create`,
-                query: router.query,
-              });
-              close();
-            }}
-            className="w-fit focus-style px-1 py-0.5 rounded"
-          >
-            <p className="text-left text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
-              Create Market
-            </p>
-          </button>
-        ) : null}
+        <button
+          onClick={() => {
+            router.push({
+              pathname: `/market/create`,
+              query: router.query,
+            });
+            close();
+          }}
+          className="w-fit focus-style px-1 py-0.5 rounded"
+        >
+          <p className="text-left text-slate-200 hover:underline focus-visible:outline-none rounded-sm focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:border-none">
+            Create Market
+          </p>
+        </button>
       </div>
       <div className="space-y-1 my-4 md:mt-2">
         <h3 className="text-xs text-transparent bg-clip-text serum-gradient">

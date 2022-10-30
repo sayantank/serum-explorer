@@ -1,4 +1,6 @@
+import { Market } from "@project-serum/serum";
 import { useMemo } from "react";
+import { useSerum } from "../context";
 import {
   calculateTotalAccountSize,
   EVENT_QUEUE_HEADER_SIZE,
@@ -20,6 +22,8 @@ export default function useSerumMarketAccountSizes({
   requestQueueLength,
   orderbookLength,
 }: useSerumMarketAccountSizesProps) {
+  const { programID } = useSerum();
+
   const totalEventQueueSize = useMemo(
     () =>
       calculateTotalAccountSize(
@@ -50,12 +54,14 @@ export default function useSerumMarketAccountSizes({
     [orderbookLength]
   );
 
+  const marketAccountRent = useRentExemption(Market.getLayout(programID).span);
   const eventQueueRent = useRentExemption(totalEventQueueSize);
   const requestQueueRent = useRentExemption(totalRequestQueueSize);
   const orderbookRent = useRentExemption(totalOrderbookSize);
 
   return {
-    marketRent: eventQueueRent + requestQueueRent + 2 * orderbookRent,
+    marketRent:
+      marketAccountRent + eventQueueRent + requestQueueRent + 2 * orderbookRent,
     totalEventQueueSize,
     totalRequestQueueSize,
     totalOrderbookSize,
