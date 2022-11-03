@@ -5,8 +5,8 @@ export const SERUM_DEX_V3_DEVNET =
   "DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY";
 
 export const DEX_PROGRAMS: { [key: string]: string } = {
-  SERUM_DEX_V3: "Serum Dex V3",
-  SERUM_DEX_V3_DEVNET: "Serum Dex V3 Devnet",
+  "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin": "Serum Dex V3",
+  DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY: "Serum Dex V3 Devnet",
 };
 
 export const MAX_U128 = "340282366920938463463374607431768211455";

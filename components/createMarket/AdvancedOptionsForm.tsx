@@ -124,7 +124,10 @@ export default function AdvancedOptionsForm({
               disabled={!useAdvancedOptions}
               className="block w-full rounded-md p-2 bg-slate-700 border-gray-300 focus-style sm:text-sm"
               {...register("orderbookLength", {
-                min: 1,
+                min: {
+                  value: 201,
+                  message: "Must be at least 201",
+                },
                 max: 1000,
                 required: true,
               })}
@@ -133,6 +136,11 @@ export default function AdvancedOptionsForm({
               {totalMarketAccountSizes.totalEventQueueSize} bytes
             </p>
           </div>
+          {errors?.orderbookLength ? (
+            <p className="text-xs text-red-400 mt-1">
+              {errors?.orderbookLength?.message}
+            </p>
+          ) : null}
         </div>
       </div>
     </div>
