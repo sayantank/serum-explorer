@@ -11,38 +11,6 @@ const Home = () => {
   const { network } = router.query;
 
   const { serumMarkets, loading: serumMarketsLoading } = useSerumMarkets();
-
-  // const [filterString, setFilterString] = useState("");
-
-  // const {
-  //   pageData: pageMarkets,
-  //   totalPages,
-  //   pageNumber,
-  //   prevPage,
-  //   nextPage,
-  // } = usePagination(serumMarkets, 5, filterString, serumMarketFilter);
-
-  // const MarketListItem = ({ market }: { market: SerumMarketInfo }) => {
-  //   return (
-  //     <div className="bg-cyan-800 hover:bg-cyan-600 transition-colors py-2 px-4 rounded flex items-center justify-between">
-  //       <div className="flex flex-col">
-  //         <h3 className="text-xs text-cyan-400">Address</h3>
-  //         <p className="font-medium text-sm ">
-  //           {market.address.toString().slice(0, 12)}...
-  //         </p>
-  //       </div>
-  //       {market.baseSymbol && market.quoteSymbol ? (
-  //         <div className="flex flex-col items-end">
-  //           <h3 className="text-xs text-cyan-400">Tokens</h3>
-  //           <p className="font-medium text-sm">
-  //             {market.baseSymbol}/{market.quoteSymbol}
-  //           </p>
-  //         </div>
-  //       ) : null}
-  //     </div>
-  //   );
-  // };
-
   const StatBlock = ({
     children,
     loading,
