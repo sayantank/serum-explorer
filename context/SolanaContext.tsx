@@ -4,9 +4,11 @@ import {
 } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import {
+  BackpackWalletAdapter,
   GlowWalletAdapter,
   PhantomWalletAdapter,
   SlopeWalletAdapter,
+  SolflareWalletAdapter,
   TorusWalletAdapter,
 } from "@solana/wallet-adapter-wallets";
 import { clusterApiUrl } from "@solana/web3.js";
@@ -96,6 +98,8 @@ export const SolanaProvider = ({ children }: SolanaProviderProps) => {
       new GlowWalletAdapter(),
       new SlopeWalletAdapter(),
       new TorusWalletAdapter(),
+      new BackpackWalletAdapter(),
+      new SolflareWalletAdapter(),
     ],
     []
   );
