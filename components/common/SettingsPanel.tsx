@@ -240,9 +240,9 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
                       <h2 className="text-sm font-medium text-slate-200">
                         {cluster.label}
                       </h2>
-                      <p className="text-xs font-light text-slate-400">
+                      {/* <p className="text-xs font-light text-slate-400">
                         {cluster.endpoint}
-                      </p>
+                      </p> */}
                     </div>
                   </li>
                 );
@@ -251,7 +251,7 @@ const SettingsPanel = ({ close }: SettingPanelProps) => {
               className={`${
                 isActiveCluster(CUSTOM_RPC_CLUSTER)
                   ? "bg-slate-600"
-                  : "bg-slate-700 py-3"
+                  : "bg-slate-700 py-2"
               } hover:bg-slate-600 p-2 cursor-pointer rounded-md`}
               onClick={() => setCluster(CUSTOM_RPC_CLUSTER)}
             >
