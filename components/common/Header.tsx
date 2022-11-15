@@ -1,5 +1,4 @@
 import { Popover, Transition } from "@headlessui/react";
-import Image from "next/image";
 import { useRouter } from "next/router";
 import { ParsedUrlQuery } from "querystring";
 import { FC, Fragment } from "react";
@@ -35,17 +34,8 @@ const Header: FC = () => {
               router.push({ pathname: "/", query: sanitizeQuery(router.query) })
             }
           >
-            <div className="h-7 w-7">
-              <Image
-                src="/serum-srm-logo.png"
-                width={1.4}
-                height={1.43}
-                layout="responsive"
-                alt="Serum Explorer"
-              />
-            </div>
             <p className="text-transparent bg-clip-text serum-gradient">
-              Explorer
+              Openbook Explorer
             </p>
           </button>
           <div className="space-x-4 hidden md:flex items-center">

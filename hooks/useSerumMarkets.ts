@@ -3,11 +3,7 @@ import { Connection, PublicKey } from "@solana/web3.js";
 import useSWR from "swr";
 import { useSerum } from "../context/SerumContext";
 import { ClusterType, useSolana } from "../context/SolanaContext";
-import {
-  MARKET_ACCOUNT_FLAGS_B58_ENCODED,
-  SERUM_DEX_V3,
-} from "../utils/constants";
-import axios from "axios";
+import { MARKET_ACCOUNT_FLAGS_B58_ENCODED } from "../utils/constants";
 import { toast } from "react-toastify";
 import { AccountTypes } from "../utils/typeChecks";
 
@@ -21,49 +17,66 @@ export type SerumMarketInfo = {
 const fetcher = async ({
   programID,
   connection,
-  cluster,
 }: {
   programID: PublicKey;
   connection: Connection;
   cluster: ClusterType;
 }): Promise<SerumMarketInfo[]> => {
-  let serumMarkets: SerumMarketInfo[];
-
-  if (cluster === "mainnet-beta" && programID.toBase58() === SERUM_DEX_V3) {
-    const { data } = await axios.get<{
-      tvl: number;
-      total_vol_1d: number;
-      markets: {
-        market_address: string;
-        base_symbol: string;
-        quote_symbol: string;
-      }[];
-    }>("https://serum-volume-tracker.vercel.app/api");
-    serumMarkets = data.markets.map((m) => ({
-      type: AccountTypes.SerumMarketInfo,
-      address: new PublicKey(m.market_address),
-      baseSymbol: m.base_symbol,
-      quoteSymbol: m.quote_symbol,
-    }));
-  } else {
-    const markets = await connection.getParsedProgramAccounts(
-      new PublicKey(programID),
-      {
-        filters: [
-          {
-            memcmp: {
-              offset: 5,
-              bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
-            },
+  const markets = await connection.getParsedProgramAccounts(
+    new PublicKey(programID),
+    {
+      filters: [
+        {
+          memcmp: {
+            offset: 5,
+            bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
           },
-        ],
-      }
-    );
-    serumMarkets = markets.map((m) => ({
-      type: AccountTypes.SerumMarketInfo,
-      address: m.pubkey,
-    }));
-  }
+        },
+      ],
+    }
+  );
+  const serumMarkets: SerumMarketInfo[] = markets.map((m) => ({
+    type: AccountTypes.SerumMarketInfo,
+    address: m.pubkey,
+  }));
+
+  // Fetch markets with symbols for mainnet-beta
+
+  // if (cluster === "mainnet-beta" && programID.toBase58() === SERUM_DEX_V3) {
+  //   const { data } = await axios.get<{
+  //     tvl: number;
+  //     total_vol_1d: number;
+  //     markets: {
+  //       market_address: string;
+  //       base_symbol: string;
+  //       quote_symbol: string;
+  //     }[];
+  //   }>("https://serum-volume-tracker.vercel.app/api");
+  //   serumMarkets = data.markets.map((m) => ({
+  //     type: AccountTypes.SerumMarketInfo,
+  //     address: new PublicKey(m.market_address),
+  //     baseSymbol: m.base_symbol,
+  //     quoteSymbol: m.quote_symbol,
+  //   }));
+  // } else {
+  //   const markets = await connection.getParsedProgramAccounts(
+  //     new PublicKey(programID),
+  //     {
+  //       filters: [
+  //         {
+  //           memcmp: {
+  //             offset: 5,
+  //             bytes: MARKET_ACCOUNT_FLAGS_B58_ENCODED,
+  //           },
+  //         },
+  //       ],
+  //     }
+  //   );
+  //   serumMarkets = markets.map((m) => ({
+  //     type: AccountTypes.SerumMarketInfo,
+  //     address: m.pubkey,
+  //   }));
+  // }
 
   return serumMarkets;
 };

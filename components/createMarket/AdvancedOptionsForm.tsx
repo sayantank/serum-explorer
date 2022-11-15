@@ -133,7 +133,7 @@ export default function AdvancedOptionsForm({
               })}
             />
             <p className="absolute right-0 mr-2 text-sm text-slate-400">
-              {totalMarketAccountSizes.totalEventQueueSize} bytes
+              {totalMarketAccountSizes.totalOrderbookSize} bytes
             </p>
           </div>
           {errors?.orderbookLength ? (

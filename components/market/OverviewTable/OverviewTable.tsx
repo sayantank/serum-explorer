@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSolana } from "../../../context";
 import { useMarket } from "../../../context/market";
 import useSerumMarketAccountLengths from "../../../hooks/useSerumMarketAccountLengths";
@@ -8,11 +7,6 @@ import { DataTable, DataTableRow } from "../../common/DataTable";
 export const OverviewTable = () => {
   const { cluster } = useSolana();
   const { serumMarket } = useMarket();
-
-  useEffect(() => {
-    console.log("[explorer] serumMarket", serumMarket?.decoded);
-  }, [serumMarket]);
-
   const { eventQueueLength, requestQueueLength, bidsLength, asksLength } =
     useSerumMarketAccountLengths({
       eventQueueAddress: serumMarket?.decoded.eventQueue,

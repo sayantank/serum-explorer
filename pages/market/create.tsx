@@ -31,7 +31,7 @@ import ExistingMintForm from "../../components/createMarket/ExistingMintForm";
 import NewMintForm from "../../components/createMarket/NewMintForm";
 import TickerForm from "../../components/createMarket/TickerForm";
 import { getHeaderLayout } from "../../components/layouts/HeaderLayout";
-import { useSerum, useSolana } from "../../context";
+import { useSerum } from "../../context";
 import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
 import {
   EVENT_QUEUE_LENGTH,
@@ -91,7 +91,6 @@ const CreateMarket = () => {
   const { connection } = useConnection();
   const wallet = useWallet();
 
-  const { cluster } = useSolana();
   const { programID } = useSerum();
 
   const { register, handleSubmit, watch, setValue, formState, clearErrors } =
@@ -621,13 +620,8 @@ const CreateMarket = () => {
               </div>
             </div>
             <div className="flex justify-end w-full">
-              <button
-                disabled={cluster.network === "mainnet-beta"}
-                className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors disabled:opacity-20"
-              >
-                {cluster.network === "mainnet-beta"
-                  ? "Unavailable for mainnet-beta"
-                  : "Create"}
+              <button className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors disabled:opacity-20">
+                Create
               </button>
             </div>
           </div>

@@ -8,7 +8,7 @@ import {
   useState,
 } from "react";
 import { toast } from "react-toastify";
-import { SERUM_DEX_V3 } from "../utils/constants";
+import { OPENBOOK_DEX } from "../utils/constants";
 
 type ProgramContextType = {
   programID: PublicKey;
@@ -24,7 +24,7 @@ const ProgramContext = createContext<ProgramContextType | null>(null);
 export const SerumProvider = ({ children }: ProgramProviderProps) => {
   const router = useRouter();
 
-  const [programID, _setProgramID] = useState(new PublicKey(SERUM_DEX_V3));
+  const [programID, _setProgramID] = useState(new PublicKey(OPENBOOK_DEX));
 
   const setProgramID = (programID: string) => {
     const newQuery: {
@@ -34,7 +34,7 @@ export const SerumProvider = ({ children }: ProgramProviderProps) => {
       programID,
     };
 
-    if (programID === SERUM_DEX_V3) delete newQuery.programID;
+    if (programID === OPENBOOK_DEX) delete newQuery.programID;
 
     try {
       new PublicKey(programID);
@@ -52,7 +52,7 @@ export const SerumProvider = ({ children }: ProgramProviderProps) => {
   useEffect(() => {
     if (router.query.programID) {
       _setProgramID(new PublicKey(router.query.programID));
-    } else _setProgramID(new PublicKey(SERUM_DEX_V3));
+    } else _setProgramID(new PublicKey(OPENBOOK_DEX));
   }, [router.query.programID]);
 
   return (

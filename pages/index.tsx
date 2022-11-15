@@ -3,7 +3,6 @@ import { useRouter } from "next/router";
 import { ReactNode } from "react";
 import { getSearchLayout } from "../components/layouts/SearchLayout";
 import { useSerumMarkets } from "../hooks/useSerumMarkets";
-import { useSerumStats } from "../hooks/useSerumStats";
 import { classNames } from "../utils/general";
 import { prettifyDecimal } from "../utils/numerical";
 
@@ -12,8 +11,6 @@ const Home = () => {
   const { network } = router.query;
 
   const { serumMarkets, loading: serumMarketsLoading } = useSerumMarkets();
-
-  const { stats, loading } = useSerumStats();
 
   // const [filterString, setFilterString] = useState("");
 
@@ -93,7 +90,7 @@ const Home = () => {
             <div className="bg-slate-700 animate-pulse w-full h-8 rounded-lg" />
           ) : null}
         </StatBlock>
-        <StatBlock loading={loading}>
+        {/* <StatBlock loading={loading}>
           <div>
             <p className="text-transparent bg-clip-text serum-gradient text-sm">
               TVL
@@ -128,7 +125,7 @@ const Home = () => {
               <p className="text-slate-500">Unavailable</p>
             </div>
           )}
-        </StatBlock>
+        </StatBlock> */}
       </div>
     </div>
   );
