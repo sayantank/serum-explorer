@@ -8,6 +8,11 @@ import {
 } from "@solana/web3.js";
 import { sleep } from "./general";
 
+export type TransactionWithSigners = {
+  transaction: Transaction;
+  signers: Array<Signer>;
+};
+
 export async function sendWalletTransaction(
   connection: Connection,
   tx: Transaction,
@@ -163,10 +168,7 @@ export async function signTransactions({
   wallet,
   connection,
 }: {
-  transactionsAndSigners: {
-    transaction: Transaction;
-    signers?: Array<Keypair>;
-  }[];
+  transactionsAndSigners: TransactionWithSigners[];
   wallet: WalletContextState;
   connection: Connection;
 }) {

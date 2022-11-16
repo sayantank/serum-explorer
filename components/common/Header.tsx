@@ -34,6 +34,15 @@ const Header: FC = () => {
               router.push({ pathname: "/", query: sanitizeQuery(router.query) })
             }
           >
+            {/* <div className="h-16 w-16 absolute">
+              <Image
+                src="/OpenBook-Logomark.svg"
+                width={1}
+                height={1}
+                layout="responsive"
+                alt="Serum Explorer"
+              />
+            </div> */}
             <p className="text-transparent bg-clip-text serum-gradient">
               Openbook Explorer
             </p>

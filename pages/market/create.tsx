@@ -42,6 +42,7 @@ import {
 import {
   sendSignedTransaction,
   signTransactions,
+  TransactionWithSigners,
 } from "../../utils/transaction";
 import useSerumMarketAccountSizes from "../../hooks/useSerumMarketAccountSizes";
 import useRentExemption from "../../hooks/useRentExemption";
@@ -395,22 +396,27 @@ const CreateMarket = () => {
       })
     );
 
+    const transactionsWithSigner: TransactionWithSigners[] = [];
+    if (mintInstructions.length > 0) {
+      transactionsWithSigner.push({
+        transaction: new Transaction().add(...mintInstructions),
+        signers: mintSigners,
+      });
+    }
+    transactionsWithSigner.push(
+      {
+        transaction: new Transaction().add(...vaultInstructions),
+        signers: vaultSigners,
+      },
+      {
+        transaction: new Transaction().add(...marketInstructions),
+        signers: marketSigners,
+      }
+    );
+
     try {
       const signedTransactions = await signTransactions({
-        transactionsAndSigners: [
-          {
-            transaction: new Transaction().add(...mintInstructions),
-            signers: mintSigners,
-          },
-          {
-            transaction: new Transaction().add(...vaultInstructions),
-            signers: vaultSigners,
-          },
-          {
-            transaction: new Transaction().add(...marketInstructions),
-            signers: marketSigners,
-          },
-        ],
+        transactionsAndSigners: transactionsWithSigner,
         wallet,
         connection,
       });
