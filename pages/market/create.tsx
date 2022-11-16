@@ -391,14 +391,14 @@ const CreateMarket = () => {
       })
     );
 
-    const transactionsWithSigner: TransactionWithSigners[] = [];
+    const transactionsWithMessages: TransactionWithSigners[] = [];
     if (mintInstructions.length > 0) {
-      transactionsWithSigner.push({
+      transactionsWithMessages.push({
         transaction: new Transaction().add(...mintInstructions),
         signers: mintSigners,
       });
     }
-    transactionsWithSigner.push(
+    transactionsWithMessages.push(
       {
         transaction: new Transaction().add(...vaultInstructions),
         signers: vaultSigners,
@@ -411,7 +411,7 @@ const CreateMarket = () => {
 
     try {
       const signedTransactions = await signTransactions({
-        transactionsAndSigners: transactionsWithSigner,
+        transactionsAndSigners: transactionsWithMessages,
         wallet,
         connection,
       });
@@ -426,16 +426,25 @@ const CreateMarket = () => {
             () => (
               <TransactionToast
                 txSig={txSig}
-                message={TRANSACTION_MESSAGES[0].successMessage}
+                message={
+                  signedTransactions.length > 2
+                    ? TRANSACTION_MESSAGES[0].successMessage
+                    : TRANSACTION_MESSAGES[1].successMessage
+                }
               />
             ),
             { autoClose: 5000 }
           );
         },
         sendingCallback: async () => {
-          toast.info(TRANSACTION_MESSAGES[0].sendingMessage, {
-            autoClose: 2000,
-          });
+          toast.info(
+            signedTransactions.length > 2
+              ? TRANSACTION_MESSAGES[0].sendingMessage
+              : TRANSACTION_MESSAGES[1].sendingMessage,
+            {
+              autoClose: 2000,
+            }
+          );
         },
       });
       await sendSignedTransaction({
@@ -447,40 +456,51 @@ const CreateMarket = () => {
             () => (
               <TransactionToast
                 txSig={txSig}
-                message={TRANSACTION_MESSAGES[1].successMessage}
+                message={
+                  signedTransactions.length > 2
+                    ? TRANSACTION_MESSAGES[1].successMessage
+                    : TRANSACTION_MESSAGES[2].successMessage
+                }
               />
             ),
             { autoClose: 5000 }
           );
         },
         sendingCallback: async () => {
-          toast.info(TRANSACTION_MESSAGES[1].sendingMessage, {
-            autoClose: 2000,
-          });
+          toast.info(
+            signedTransactions.length > 2
+              ? TRANSACTION_MESSAGES[1].sendingMessage
+              : TRANSACTION_MESSAGES[2].sendingMessage,
+            {
+              autoClose: 2000,
+            }
+          );
         },
       });
 
-      await sendSignedTransaction({
-        signedTransaction: signedTransactions[2],
-        connection,
-        skipPreflight: false,
-        successCallback: async (txSig) => {
-          toast(
-            () => (
-              <TransactionToast
-                txSig={txSig}
-                message={TRANSACTION_MESSAGES[2].successMessage}
-              />
-            ),
-            { autoClose: 5000 }
-          );
-        },
-        sendingCallback: async () => {
-          toast.info(TRANSACTION_MESSAGES[2].sendingMessage, {
-            autoClose: 2000,
-          });
-        },
-      });
+      if (signedTransactions.length > 2) {
+        await sendSignedTransaction({
+          signedTransaction: signedTransactions[2],
+          connection,
+          skipPreflight: false,
+          successCallback: async (txSig) => {
+            toast(
+              () => (
+                <TransactionToast
+                  txSig={txSig}
+                  message={TRANSACTION_MESSAGES[2].successMessage}
+                />
+              ),
+              { autoClose: 5000 }
+            );
+          },
+          sendingCallback: async () => {
+            toast.info(TRANSACTION_MESSAGES[2].sendingMessage, {
+              autoClose: 2000,
+            });
+          },
+        });
+      }
 
       router.push({
         pathname: `${marketAccounts.market.publicKey.toBase58()}`,
