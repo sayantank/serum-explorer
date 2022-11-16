@@ -289,20 +289,15 @@ const CreateMarket = () => {
 
     vaultSigners.push(marketAccounts.baseVault, marketAccounts.quoteVault);
 
-    let baseLotSize: number;
-    let quoteLotSize: number;
-    if (data.lotSize > 0) {
-      baseLotSize = Math.round(
-        10 ** baseMintDecimals * Math.pow(10, -1 * data.tickSize)
-      );
-      quoteLotSize = Math.round(
-        10 ** quoteMintDecimals *
-          Math.pow(10, -1 * data.lotSize) *
-          Math.pow(10, -1 * data.tickSize)
-      );
-    } else {
-      throw new Error("Invalid Lot Size");
-    }
+    // tickSize and lotSize here are the 1e^(-x) values, so no check for ><= 0
+    const baseLotSize = Math.round(
+      10 ** baseMintDecimals * Math.pow(10, -1 * data.tickSize)
+    );
+    const quoteLotSize = Math.round(
+      10 ** quoteMintDecimals *
+        Math.pow(10, -1 * data.lotSize) *
+        Math.pow(10, -1 * data.tickSize)
+    );
 
     // create market account
     marketInstructions.push(
