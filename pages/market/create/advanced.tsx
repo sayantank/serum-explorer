@@ -89,8 +89,8 @@ const CreateMarketAdvanced = () => {
         asks: new PublicKey(data.asksAccount),
         baseVault: new PublicKey(data.baseVault),
         quoteVault: new PublicKey(data.quoteVault),
-        baseMint,
-        quoteMint,
+        baseMint: baseMint.address,
+        quoteMint: quoteMint.address,
         baseLotSize: new BN(baseLotSize),
         quoteLotSize: new BN(quoteLotSize),
         feeRateBps: 150, // Unused in v3
