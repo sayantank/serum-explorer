@@ -47,12 +47,12 @@ export const OverviewTable = () => {
           )}
         />
         <DataTableRow
-          label="Tick Size"
-          value={serumMarket.tickSize.toString()}
-        />
-        <DataTableRow
           label="Min. Order Size"
           value={serumMarket.minOrderSize.toString()}
+        />
+        <DataTableRow
+          label="Price Tick"
+          value={serumMarket.tickSize.toString()}
         />
         <DataTableRow
           label="Event Queue Length"

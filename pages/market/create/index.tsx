@@ -24,28 +24,28 @@ import { useRouter } from "next/router";
 import { ReactNode, useEffect } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
-import TransactionToast from "../../components/common/Toasts/TransactionToast";
-import AdvancedOptionsForm from "../../components/createMarket/AdvancedOptionsForm";
-import CreateMintOption from "../../components/createMarket/CreateMintOption";
-import ExistingMintForm from "../../components/createMarket/ExistingMintForm";
-import NewMintForm from "../../components/createMarket/NewMintForm";
-import TickerForm from "../../components/createMarket/TickerForm";
-import { getHeaderLayout } from "../../components/layouts/HeaderLayout";
-import { useSerum } from "../../context";
-import { tokenAtomicsToPrettyDecimal } from "../../utils/numerical";
+import TransactionToast from "../../../components/common/Toasts/TransactionToast";
+import AdvancedOptionsForm from "../../../components/createMarket/AdvancedOptionsForm";
+import CreateMintOption from "../../../components/createMarket/CreateMintOption";
+import ExistingMintForm from "../../../components/createMarket/ExistingMintForm";
+import NewMintForm from "../../../components/createMarket/NewMintForm";
+import TickerForm from "../../../components/createMarket/TickerForm";
+import { getHeaderLayout } from "../../../components/layouts/HeaderLayout";
+import { useSerum } from "../../../context";
+import { tokenAtomicsToPrettyDecimal } from "../../../utils/numerical";
 import {
   EVENT_QUEUE_LENGTH,
   getVaultOwnerAndNonce,
   ORDERBOOK_LENGTH,
   REQUEST_QUEUE_LENGTH,
-} from "../../utils/serum";
+} from "../../../utils/serum";
 import {
   sendSignedTransaction,
   signTransactions,
   TransactionWithSigners,
-} from "../../utils/transaction";
-import useSerumMarketAccountSizes from "../../hooks/useSerumMarketAccountSizes";
-import useRentExemption from "../../hooks/useRentExemption";
+} from "../../../utils/transaction";
+import useSerumMarketAccountSizes from "../../../hooks/useSerumMarketAccountSizes";
+import useRentExemption from "../../../hooks/useRentExemption";
 
 const TRANSACTION_MESSAGES = [
   {
@@ -291,7 +291,7 @@ const CreateMarket = () => {
 
     // tickSize and lotSize here are the 1e^(-x) values, so no check for ><= 0
     const baseLotSize = Math.round(
-      10 ** baseMintDecimals * Math.pow(10, -1 * data.tickSize)
+      10 ** baseMintDecimals * Math.pow(10, -1 * data.lotSize)
     );
     const quoteLotSize = Math.round(
       10 ** quoteMintDecimals *
