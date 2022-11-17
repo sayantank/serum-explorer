@@ -1,11 +1,14 @@
 export const EXPLORER_ADDRESS_BASE = "https://explorer.solana.com/address/";
 
 export const OPENBOOK_DEX = "srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX"; // openbook now
+export const OPENBOOK_DEX_DEVNET =
+  "EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj";
 export const SERUM_DEX_V3_DEVNET =
   "DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY";
 
 export const DEX_PROGRAMS: { [key: string]: string } = {
   srmqPvymJeFKQ4zGQed1GFppgkRHL9kaELCbyksJtPX: "Openbook Dex",
+  EoTcMgcDRTJVZDMZWBoU6rhYHZfkNTVEAfz3uUJRcYGj: "Openbook Dex Devnet",
   "9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin": "Serum Dex (Compromised)",
   DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY: "Serum Dex V3 Devnet",
 };
