@@ -423,6 +423,14 @@ const CreateMarketAdvanced = () => {
               </div>
             </div>
           </div>
+          <div className="flex justify-end w-full">
+            <button
+              type="submit"
+              className="w-full md:max-w-xs rounded-lg p-2 bg-cyan-500 hover:bg-cyan-600 transition-colors disabled:opacity-20"
+            >
+              Create
+            </button>
+          </div>
         </div>
       </form>
     </div>
