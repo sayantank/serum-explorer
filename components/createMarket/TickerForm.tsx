@@ -20,7 +20,6 @@ export default function TickerForm({ register }: TickerFormProps) {
             className="block w-full p-2 rounded-md text-slate-200 bg-slate-700 focus-style pl-16 sm:pl-14 sm:text-sm"
             {...register("lotSize", {
               required: true,
-              min: 0,
             })}
           />
         </div>
@@ -51,7 +50,6 @@ export default function TickerForm({ register }: TickerFormProps) {
             className="block w-full p-2 rounded-md text-slate-200 bg-slate-700 focus-style pl-16 sm:pl-14 sm:text-sm"
             {...register("tickSize", {
               required: true,
-              min: 0,
             })}
           />
         </div>
