@@ -1,7 +1,20 @@
+import { DexInstructions } from "@project-serum/serum";
+import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import BN from "bn.js";
 import { ReactNode } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { toast } from "react-toastify";
+import TransactionToast from "../../../components/common/Toasts/TransactionToast";
 import { getHeaderLayout } from "../../../components/layouts/HeaderLayout";
+import { useSerum } from "../../../context";
 import { validatePubkey } from "../../../utils/pubkey";
+import { getVaultOwnerAndNonce } from "../../../utils/serum";
+import { validateMint, validateTokenAccount } from "../../../utils/token";
+import {
+  sendSignedTransaction,
+  signTransaction,
+} from "../../../utils/transaction";
 
 export type CreateMarketAdvancedFormValues = {
   baseMint: string;
@@ -18,6 +31,11 @@ export type CreateMarketAdvancedFormValues = {
 };
 
 const CreateMarketAdvanced = () => {
+  const wallet = useWallet();
+  const { connection } = useConnection();
+
+  const { programID } = useSerum();
+
   const {
     register,
     handleSubmit,
@@ -27,13 +45,99 @@ const CreateMarketAdvanced = () => {
   const handleCreateAdvanced: SubmitHandler<
     CreateMarketAdvancedFormValues
   > = async (data) => {
-    console.log(data);
+    if (!wallet || !wallet.publicKey) {
+      toast.error("Wallet not connected.");
+      return;
+    }
+
+    try {
+      const [vaultOwner, vaultOwnerNonce] = await getVaultOwnerAndNonce(
+        new PublicKey(data.marketAccount),
+        programID
+      );
+
+      const quoteMint = await validateMint(connection, data.quoteMint);
+      const baseMint = await validateMint(connection, data.baseMint);
+      await validateTokenAccount(
+        connection,
+        data.quoteVault,
+        data.quoteMint,
+        vaultOwner.toBase58()
+      );
+      await validateTokenAccount(
+        connection,
+        data.baseVault,
+        data.baseMint,
+        vaultOwner.toBase58()
+      );
+
+      // tickSize and lotSize here are the 1e^(-x) values, so no check for ><= 0
+      const baseLotSize = Math.round(
+        10 ** baseMint.decimals * Math.pow(10, -1 * data.lotSize)
+      );
+      const quoteLotSize = Math.round(
+        10 ** quoteMint.decimals *
+          Math.pow(10, -1 * data.lotSize) *
+          Math.pow(10, -1 * data.tickSize)
+      );
+
+      const ix = DexInstructions.initializeMarket({
+        market: new PublicKey(data.marketAccount),
+        requestQueue: new PublicKey(data.requestQueueAccount),
+        eventQueue: new PublicKey(data.eventQueueAccount),
+        bids: new PublicKey(data.bidsAccount),
+        asks: new PublicKey(data.asksAccount),
+        baseVault: new PublicKey(data.baseVault),
+        quoteVault: new PublicKey(data.quoteVault),
+        baseMint,
+        quoteMint,
+        baseLotSize: new BN(baseLotSize),
+        quoteLotSize: new BN(quoteLotSize),
+        feeRateBps: 150, // Unused in v3
+        quoteDustThreshold: new BN(500), // Unused in v3
+        vaultSignerNonce: vaultOwnerNonce,
+        programId: programID,
+      });
+
+      const tx = new Transaction().add(ix);
+      const signedTx = await signTransaction({
+        transaction: tx,
+        wallet,
+        signers: [],
+        connection,
+      });
+
+      await sendSignedTransaction({
+        signedTransaction: signedTx,
+        connection,
+        skipPreflight: false,
+        successCallback: async (txSig) => {
+          toast(
+            () => (
+              <TransactionToast
+                txSig={txSig}
+                message="Created market successfully."
+              />
+            ),
+            { autoClose: 5000 }
+          );
+        },
+        sendingCallback: async () => {
+          toast.info("Creating market...", {
+            autoClose: 2000,
+          });
+        },
+      });
+    } catch (e) {
+      console.error("[serum_explorer]: ", e);
+      toast.error("Failed to create market. Check console for details.");
+    }
   };
 
   return (
     <div className="space-y-4 mb-6">
       <div>
-        <h1 className="text-2xl text-slate-200">Create Market</h1>
+        <h1 className="text-2xl text-slate-200">Advanced Create Market</h1>
       </div>
       <form onSubmit={handleSubmit(handleCreateAdvanced)}>
         <div className="space-y-4">
@@ -152,7 +256,7 @@ const CreateMarketAdvanced = () => {
                 <div className="space-y-2">
                   <div>
                     <label className="block text-xs text-slate-400">
-                      Lot Size
+                      Min. Order Size
                     </label>
                     <div className="relative mt-1 rounded-md shadow-sm">
                       <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -175,7 +279,7 @@ const CreateMarketAdvanced = () => {
                       data-tooltip-target="tooltip-default"
                       className="block text-xs text-slate-400"
                     >
-                      Tick Size
+                      Price Tick
                     </label>
                     <div
                       id="tooltip-default"

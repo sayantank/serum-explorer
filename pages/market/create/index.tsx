@@ -391,14 +391,14 @@ const CreateMarket = () => {
       })
     );
 
-    const transactionsWithMessages: TransactionWithSigners[] = [];
+    const transactionWithSigners: TransactionWithSigners[] = [];
     if (mintInstructions.length > 0) {
-      transactionsWithMessages.push({
+      transactionWithSigners.push({
         transaction: new Transaction().add(...mintInstructions),
         signers: mintSigners,
       });
     }
-    transactionsWithMessages.push(
+    transactionWithSigners.push(
       {
         transaction: new Transaction().add(...vaultInstructions),
         signers: vaultSigners,
@@ -411,7 +411,7 @@ const CreateMarket = () => {
 
     try {
       const signedTransactions = await signTransactions({
-        transactionsAndSigners: transactionsWithMessages,
+        transactionsAndSigners: transactionWithSigners,
         wallet,
         connection,
       });
