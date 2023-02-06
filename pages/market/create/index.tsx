@@ -11,6 +11,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from "@solana/spl-token-2";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
+import axios from 'axios';
 import {
   Keypair,
   PublicKey,
@@ -46,6 +47,7 @@ import {
 } from "../../../utils/transaction";
 import useSerumMarketAccountSizes from "../../../hooks/useSerumMarketAccountSizes";
 import useRentExemption from "../../../hooks/useRentExemption";
+import { type } from "os";
 
 const TRANSACTION_MESSAGES = [
   {
@@ -88,6 +90,9 @@ export type CreateMarketFormValues = {
 
 const CreateMarket = () => {
   const router = useRouter();
+  
+  
+  
 
   const { connection } = useConnection();
   const wallet = useWallet();
@@ -107,6 +112,24 @@ const CreateMarket = () => {
   const eventQueueLength = watch("eventQueueLength");
   const requestQueueLength = watch("requestQueueLength");
   const orderbookLength = watch("orderbookLength");
+  const basemint = watch("existingMints.baseMint");
+  const quotemint = watch("existingMints.quoteMint");
+
+  // console.log([quotemint, basemint])
+
+  let price;
+
+  useEffect(() => {
+    const getPrices = async () => {
+      const res = await axios(`https://quote-api.jup.ag/v4/price?ids=${basemint}&vsToken=${quotemint}&vsAmount=1`);
+      const value = res.data
+      console.log(value)
+      return value;
+     
+  };
+   price = getPrices()
+  },[basemint, quotemint])
+
 
   const mintRent = useRentExemption(createMint ? MINT_SIZE : 0);
   const vaultRent = useRentExemption(ACCOUNT_SIZE);
@@ -595,7 +618,7 @@ const CreateMarket = () => {
                   </p>
                 </div>
                 <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
-                  <TickerForm register={register} />
+                  <TickerForm price={price} register={register} />
                 </div>
               </div>
             </div>

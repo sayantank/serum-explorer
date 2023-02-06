@@ -3,8 +3,10 @@ import { CreateMarketFormValues } from "../../pages/market/create";
 
 type TickerFormProps = {
   register: UseFormRegister<CreateMarketFormValues>;
+  price?: string;
 };
-export default function TickerForm({ register }: TickerFormProps) {
+
+export default function TickerForm({ register, price }: TickerFormProps) {
   return (
     <div className="space-y-2">
       <div>
@@ -17,6 +19,7 @@ export default function TickerForm({ register }: TickerFormProps) {
           </div>
           <input
             type="number"
+           //
             className="block w-full p-2 rounded-md text-slate-200 bg-slate-700 focus-style pl-16 sm:pl-14 sm:text-sm"
             {...register("lotSize", {
               required: true,

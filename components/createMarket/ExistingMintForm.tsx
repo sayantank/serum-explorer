@@ -6,6 +6,7 @@ import { validatePubkey } from "../../utils/pubkey";
 type ExistingMintFormProps = {
   register: UseFormRegister<CreateMarketFormValues>;
   formState: FormState<CreateMarketFormValues>;
+  
 };
 export default function ExistingMintForm({
   register,
@@ -15,7 +16,7 @@ export default function ExistingMintForm({
   // useEffect here to fetch data from jupiter api 
 
   useEffect(() => {
-   
+    
   }, []);
 
   return (
