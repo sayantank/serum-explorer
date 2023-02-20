@@ -22,7 +22,7 @@ import {
 import BN from "bn.js";
 import ReactTooltip from "react-tooltip";
 import { useRouter } from "next/router";
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import TransactionToast from "../../../components/common/Toasts/TransactionToast";
@@ -47,7 +47,7 @@ import {
 } from "../../../utils/transaction";
 import useSerumMarketAccountSizes from "../../../hooks/useSerumMarketAccountSizes";
 import useRentExemption from "../../../hooks/useRentExemption";
-import { type } from "os";
+//import { type } from "os";
 
 const TRANSACTION_MESSAGES = [
   {
@@ -76,6 +76,7 @@ type ExistingMintFormValues = {
   quoteMint: string;
 };
 
+
 export type CreateMarketFormValues = {
   createMint: boolean;
   newMints?: NewMintFormValues;
@@ -91,7 +92,9 @@ export type CreateMarketFormValues = {
 const CreateMarket = () => {
   const router = useRouter();
   
-  
+  const [price, setPrice] = useState< number | null >()
+
+  const [unitprice, setUnitprice] = useState< number | null >()
   
 
   const { connection } = useConnection();
@@ -114,22 +117,36 @@ const CreateMarket = () => {
   const orderbookLength = watch("orderbookLength");
   const basemint = watch("existingMints.baseMint");
   const quotemint = watch("existingMints.quoteMint");
+  
+   console.log([quotemint, basemint])
 
-  // console.log([quotemint, basemint])
-
-  let price;
-
+  
+ // fetches price using jupiter's API. Quote is either SOL or USDC
   useEffect(() => {
-    const getPrices = async () => {
-      const res = await axios(`https://quote-api.jup.ag/v4/price?ids=${basemint}&vsToken=${quotemint}&vsAmount=1`);
-      const value = res.data
-      console.log(value)
-      return value;
-     
-  };
-   price = getPrices()
+
+    try{
+      axios.get(`https://quote-api.jup.ag/v4/price?ids=${basemint}&vsToken=${quotemint}&vsAmount=1`)
+      .then((res) =>{ setPrice(res.data.data[basemint].price) })
+    }catch(error){
+
+      console.log(error)
+    } 
+ 
   },[basemint, quotemint])
 
+  useEffect(() => {
+
+    try{
+      axios.get(`https://quote-api.jup.ag/v4/price?ids=${basemint}&vsAmount=1`)
+      .then((res) =>{ setUnitprice(res.data.data[basemint].price) }) 
+    }catch(error){
+
+     console.log(error)
+    }
+    
+  },[basemint])
+
+  
 
   const mintRent = useRentExemption(createMint ? MINT_SIZE : 0);
   const vaultRent = useRentExemption(ACCOUNT_SIZE);
@@ -618,7 +635,11 @@ const CreateMarket = () => {
                   </p>
                 </div>
                 <div className="mt-5 space-y-4 md:col-span-2 md:mt-0">
-                  <TickerForm price={price} register={register} />
+                  <TickerForm 
+                  price={price} 
+                  register={register} 
+                  watch={watch}
+                  unitprice={unitprice} />
                 </div>
               </div>
             </div>

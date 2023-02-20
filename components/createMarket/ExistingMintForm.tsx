@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { FormState, UseFormRegister } from "react-hook-form";
 import { CreateMarketFormValues } from "../../pages/market/create";
 import { validatePubkey } from "../../utils/pubkey";
@@ -13,11 +12,6 @@ export default function ExistingMintForm({
   formState: { errors },
 }: ExistingMintFormProps) {
 
-  // useEffect here to fetch data from jupiter api 
-
-  useEffect(() => {
-    
-  }, []);
 
   return (
     <div className="space-y-2">
