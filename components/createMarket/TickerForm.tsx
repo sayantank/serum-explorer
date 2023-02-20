@@ -3,8 +3,29 @@ import { CreateMarketFormValues } from "../../pages/market/create";
 
 type TickerFormProps = {
   register: UseFormRegister<CreateMarketFormValues>;
+  watch: UseFormRegister<CreateMarketFormValues>;
+  price?: number | null;
+  unitprice?: number | null;
 };
-export default function TickerForm({ register }: TickerFormProps) {
+
+export default function TickerForm({ register, price, unitprice, watch }: TickerFormProps) {
+   
+  //this is the calculation for the tick size, it 0.0001 the value of the price
+  const tick: number = price! * (1/10000)
+
+  const tickSizeInput = watch("tickSize");
+
+  const tickSizeValue = price ? tick : tickSizeInput
+
+  // this is the calculation of the lot size, it is 1 dollar's quantity of the token
+  const minLotsize: number = 1 / unitprice!
+
+  const lotSizeInput = watch("lotSize");
+
+  const lotSizeValue =  unitprice ? minLotsize : lotSizeInput
+
+  
+  
   return (
     <div className="space-y-2">
       <div>
@@ -17,6 +38,9 @@ export default function TickerForm({ register }: TickerFormProps) {
           </div>
           <input
             type="number"
+            value={`${lotSizeValue}`}
+            placeholder={`${lotSizeValue}`}
+           //
             className="block w-full p-2 rounded-md text-slate-200 bg-slate-700 focus-style pl-16 sm:pl-14 sm:text-sm"
             {...register("lotSize", {
               required: true,
@@ -47,6 +71,8 @@ export default function TickerForm({ register }: TickerFormProps) {
           </div>
           <input
             type="number"
+            value={`${tickSizeValue}`}
+            placeholder={`${tickSizeValue}`}
             className="block w-full p-2 rounded-md text-slate-200 bg-slate-700 focus-style pl-16 sm:pl-14 sm:text-sm"
             {...register("tickSize", {
               required: true,

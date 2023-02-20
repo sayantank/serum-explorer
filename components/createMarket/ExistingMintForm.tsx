@@ -5,11 +5,14 @@ import { validatePubkey } from "../../utils/pubkey";
 type ExistingMintFormProps = {
   register: UseFormRegister<CreateMarketFormValues>;
   formState: FormState<CreateMarketFormValues>;
+  
 };
 export default function ExistingMintForm({
   register,
   formState: { errors },
 }: ExistingMintFormProps) {
+
+
   return (
     <div className="space-y-2">
       <div>
@@ -33,14 +36,23 @@ export default function ExistingMintForm({
       <div>
         <label className="block text-xs text-slate-400">Quote Mint</label>
         <div className="mt-1">
-          <input
+          {/* <input
             type="text"
             className="block w-full rounded-md p-2 bg-slate-700 focus-style sm:text-sm"
             {...register("existingMints.quoteMint", {
               required: true,
               validate: validatePubkey,
             })}
-          />
+            /> */}
+            
+            <select
+            className="block w-full rounded-md p-2 bg-slate-700 focus-style sm:text-sm"
+            {...register("existingMints.quoteMint", { required: true })}>
+            <option value="EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v">USDC</option>
+            <option value="So11111111111111111111111111111111111111112">SOL</option>
+          </select>
+          
+        
           {errors?.existingMints?.quoteMint ? (
             <p className="text-xs text-red-400 mt-1">
               {errors?.existingMints?.quoteMint?.message}
